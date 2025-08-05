@@ -1,13 +1,30 @@
 import { ArrowRight } from "lucide-react";
 import MenuCard from "../components/MenuCard";
-import { MenuData } from "../data/MenuData";
+//import { MenuData } from "../data/MenuData";
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
+
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase/firebaseConfig";
 
 export const Menu = () => {
   const [jumlah, setJumlah] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
   const isFirstLoad = useRef(true);
+
+  const [MenuData, setMenu] = useState([]);
+
+  useEffect(() => {
+    async function fetchMenu() {
+      const querySnapshot = await getDocs(collection(db, "menu_makanan"));
+      const list = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setMenu(list);
+    }
+    fetchMenu();
+  }, []);
 
   //Simpan menu yang sudah dipilih ke local storage agar dapat dipull kembali saat user ingin mengganti menu
   //load menu jika ada value
@@ -57,18 +74,21 @@ export const Menu = () => {
       <main>
         {/* food items section */}
         <div className="grid grid-cols-2 gap-4 max-h-screen scrollbar-hide overflow-y-scroll">
-          {MenuData.map((item) => (
-            <MenuCard
-              key={item.id}
-              id={item.id}
-              name={item.name}
-              price={item.price}
-              image={item.Image}
-              jumlah={jumlah[item.id] || 0}
-              tambah={tambah}
-              kurang={kurang}
-            />
-          ))}
+          {MenuData
+            .slice() // creates a copy so the original array isn't mutated
+            .sort((a, b) => a.name.localeCompare(b.name)) // sort by name descending
+            .map((item) => (
+              <MenuCard
+                key={item.id}
+                id={item.id}
+                name={item.name}
+                price={item.price}
+                image={item.image}
+                jumlah={jumlah[item.id] || 0}
+                tambah={tambah}
+                kurang={kurang}
+              />
+            ))}
         </div>
 
         {/* cart button */}

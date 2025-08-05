@@ -13,7 +13,7 @@ const MenuCard = ({ id, name, price, image, jumlah, tambah, kurang}) => {
         {/* nama menu + price */}
         <div className="mt-4 text-left">
           <h3 className="text-black text-sm font-medium">{name}</h3>
-          <p className="text-red-500 text-sm font-semibold">Rp{price.toFixed(3)}</p>
+          <p className="text-red-500 text-sm font-semibold">Rp{price}</p>
         </div>
       </div>
 

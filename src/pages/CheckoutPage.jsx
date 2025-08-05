@@ -82,7 +82,7 @@ export const CheckoutPage = () => {
                         <CheckoutCard
                             key={item.id}
                             id={item.id}
-                            image={item.Image}
+                            image={item.image}
                             name={item.name}
                             jumlah={item.jumlah}
                             price={item.price}
@@ -91,7 +91,7 @@ export const CheckoutPage = () => {
                 </div>
                 <div className="flex justify-between mt-4 border-t pt-2">
                     <p className="font-semibold">Total Order</p>
-                    <p className="text-green-700 font-semibold">Rp{total.toFixed(3)}</p>
+                    <p className="text-green-700 font-semibold">Rp{total}</p>
                 </div>
             </div>
 

@@ -42,7 +42,7 @@ export const ConfirmationPage = () => {
                                 <span>{item.name}</span>
                             </div>
                             <div className="text-right font-semibold">
-                                Rp{item.price.toFixed(3)}
+                                Rp{item.price}
                             </div>
                         </div>
                     ))}
@@ -51,7 +51,7 @@ export const ConfirmationPage = () => {
 
                 <div className="flex justify-between mt-4 border-t pt-2">
                     <p className="font-semibold">Total</p>
-                    <p className="text-green-700 font-semibold">Rp{total.toFixed(3)}</p>
+                    <p className="text-green-700 font-semibold">Rp{total}</p>
                 </div>
             </div>
 
