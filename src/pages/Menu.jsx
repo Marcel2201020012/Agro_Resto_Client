@@ -7,6 +7,12 @@ import { Link } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 
+function removeSessionStorage() {
+  sessionStorage.removeItem("fullName");
+  sessionStorage.setItem("jumlah_menu", "");
+  sessionStorage.removeItem("isSubmit");
+}
+
 export const Menu = () => {
   const [jumlah, setJumlah] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
@@ -15,13 +21,17 @@ export const Menu = () => {
   const [MenuData, setMenu] = useState([]);
 
   useEffect(() => {
-    async function fetchMenu() {
-      const querySnapshot = await getDocs(collection(db, "menu_makanan"));
-      const list = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setMenu(list);
+    const fetchMenu = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "menu_makanan"));
+        const list = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setMenu(list);
+      } finally {
+        setIsLoaded(true);
+      }
     }
     fetchMenu();
   }, []);
@@ -29,11 +39,17 @@ export const Menu = () => {
   //Simpan menu yang sudah dipilih ke local storage agar dapat dipull kembali saat user ingin mengganti menu
   //load menu jika ada value
   useEffect(() => {
+    const isSubmit = sessionStorage.getItem("isSubmit");
     const savedMenu = sessionStorage.getItem("jumlah_menu");
+
+    if (isSubmit === "1") {
+      removeSessionStorage();
+      return;
+    }
+
     if (savedMenu) {
       setJumlah(JSON.parse(savedMenu));
     }
-    setIsLoaded(true);
   }, []);
 
   //save menu setelah load pertama
@@ -64,7 +80,13 @@ export const Menu = () => {
     });
   };
 
-  if (!isLoaded) return <div>Loading...</div>;
+  if (!isLoaded) {
+        return (
+            <div className="container min-h-screen flex justify-center items-center">
+                <p className="text-lg font-semibold">Loading Menu...</p>
+            </div>
+        )
+    }
   const totalMenu = Object.values(jumlah).reduce((a, b) => a + b, 0);
   const selectedMenu = MenuData.filter(item => jumlah[item.id] > 0).map(item => ({ ...item, jumlah: jumlah[item.id] }));
 

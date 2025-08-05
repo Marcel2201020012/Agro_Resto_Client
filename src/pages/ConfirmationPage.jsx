@@ -1,11 +1,93 @@
-import { Link } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { db } from "../../firebase/firebaseConfig";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+
+function generateTransactionId(tableId = "XX") {
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+    return `AR-${tableId}-${random}`;
+}
+
+function removeSessionStorage() {
+    sessionStorage.removeItem("fullName");
+    sessionStorage.removeItem("jumlah_menu");
+    sessionStorage.removeItem("isSubmit");
+}
 
 export const ConfirmationPage = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const selectedMenu = location.state?.selectedMenu || [];
     const total = location.state?.total || 0;
     const fullName = location.state?.fullName || "";
+    const tableId = location.state?.tableId || "00";
+
+    const [transactionId, setTransactionId] = useState("");
+    const hasSaved = useRef(false);
+    const [isSaving, setIsSaving] = useState(true);
+
+    const handleConfirm = () => {
+        removeSessionStorage();
+        navigate("/menu"), {replace: true};
+    }
+
+    useEffect(() => {
+        const jumlahMenu = sessionStorage.getItem("jumlah_menu");
+
+        if (jumlahMenu === null) {
+            removeSessionStorage();
+            navigate("/menu", { replace: true });
+            return;
+        }
+
+        const jumlah = JSON.parse(jumlahMenu);
+
+        if (
+            (Array.isArray(jumlah) && jumlah.length === 0) ||
+            (typeof jumlah === "object" && !Array.isArray(jumlah) && Object.keys(jumlah).length === 0)
+        ) {
+            removeSessionStorage();
+            navigate("/menu", { replace: true });
+            return;
+        }
+
+        const saveOrder = async () => {
+            if (hasSaved.current) return;
+            hasSaved.current = true;
+            const txId = generateTransactionId(tableId);
+            setTransactionId(txId);
+
+            const orderData = {
+                customerName: fullName,
+                status: "waiting for payment",
+                orderDetails: selectedMenu,
+                total,
+                tableId,
+                createdAt: serverTimestamp()
+            };
+
+            try {
+                await setDoc(doc(db, "transaction_id", txId), orderData);
+                sessionStorage.setItem("isSubmit", "1");
+                console.log("Order saved:", txId);
+            } catch (error) {
+                console.error("Error saving order:", error);
+            } finally {
+                setIsSaving(false);
+            }
+        };
+
+        saveOrder();
+    }, [navigate, fullName, selectedMenu, total, tableId]);
+
+
+    if (isSaving) {
+        return (
+            <div className="container min-h-screen flex justify-center items-center">
+                <p className="text-lg font-semibold">Saving your order...</p>
+            </div>
+        )
+    }
 
     return (
         <div className="container min-h-screen overflow-x-hidden pt-8 pb-16">
@@ -17,7 +99,7 @@ export const ConfirmationPage = () => {
 
                     <div>
                         <div className="font-bold">Transcation ID</div>
-                        <div>123-abc</div>
+                        <div>{transactionId}</div>
                     </div>
 
                     <div>
@@ -56,9 +138,9 @@ export const ConfirmationPage = () => {
             </div>
 
             <div className="flex mt-10">
-                <Link to={"/menu"} className="bg-agro-color rounded-full text-white px-6 py-2">
+                <button onClick={handleConfirm} className="bg-agro-color rounded-full text-white px-6 py-2">
                     <span>Back</span>
-                </Link>
+                </button>
             </div>
 
         </div>

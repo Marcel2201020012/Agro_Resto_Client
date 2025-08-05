@@ -16,7 +16,6 @@ export const CheckoutPage = () => {
     const [fullName, setFullName] = useState('');
     const [tableId, setTableId] = useState('');
     const [fullNameError, setFullNameError] = useState("");
-    const [isLoaded, setIsLoaded] = useState(false);
 
     const isFirstLoad = useRef(true);
 
@@ -25,7 +24,6 @@ export const CheckoutPage = () => {
         if (userName) {
             setFullName(JSON.parse(userName));
         }
-        setIsLoaded(true);
     }, []);
 
     useEffect(() => {
@@ -50,21 +48,21 @@ export const CheckoutPage = () => {
 
         if (!validateFullName()) return;
 
-        // Save the data to send later
         setPendingData({ fullName, selectedMenu, total });
 
-        // Show confirmation modal
         setShowModal(true);
     };
 
-    const handleConfirm = () => {
-        setShowModal(false);
-        if (pendingData) {
-            navigate("/confirm", {
-                state: pendingData
-            });
-        }
-    };
+  const handleConfirm = () => {
+    setShowModal(false);
+    if (pendingData) {
+        navigate("/confirm", {
+            replace: true,
+            state: pendingData
+        });
+    }
+};
+
 
     const handleCancel = () => {
         setShowModal(false);
