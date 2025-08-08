@@ -38,6 +38,8 @@ export const ConfirmationPage = () => {
     const hasSaved = useRef(false);
     const [isSaving, setIsSaving] = useState(true);
 
+    const isSubmit = sessionStorage.getItem("isSubmit")
+
     const handleConfirm = () => {
         removeSessionStorage();
         navigate("/menu"), { replace: true };
