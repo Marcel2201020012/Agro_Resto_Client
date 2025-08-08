@@ -19,12 +19,20 @@ export const CheckoutPage = () => {
     const [fullName, setFullName] = useState('');
     const [fullNameError, setFullNameError] = useState("");
 
+    const [payment, setPayment] = useState("");
+    const [paymentError, setPaymentError] = useState("");
+
     const isFirstLoad = useRef(true);
 
     useEffect(() => {
         const userName = sessionStorage.getItem("fullName");
         if (userName) {
             setFullName(JSON.parse(userName));
+        }
+
+        const payment = sessionStorage.getItem("payment");
+        if (payment) {
+            setPayment(JSON.parse(payment));
         }
     }, []);
 
@@ -34,7 +42,8 @@ export const CheckoutPage = () => {
             return;
         }
         sessionStorage.setItem("fullName", JSON.stringify(fullName));
-    }, [fullName]);
+        sessionStorage.setItem("payment", JSON.stringify(payment));
+    }, [fullName, payment]);
 
     const validateFullName = () => {
         if (fullName.trim().length < 3) {
@@ -45,26 +54,34 @@ export const CheckoutPage = () => {
         return true;
     };
 
+    const validatePaymentMethode = () => {
+        if (payment === ""){
+             setPaymentError("Please choose a payment methode.");
+             return false;
+        }
+        setPaymentError("");
+        return true;
+    }
+
     const handleNextClick = (e) => {
         e.preventDefault();
 
-        if (!validateFullName()) return;
+        if (!validateFullName() || !validatePaymentMethode()) return;
 
-        setPendingData({ fullName, selectedMenu, total });
+        setPendingData({ fullName, selectedMenu, total, payment });
 
         setShowModal(true);
     };
 
-  const handleConfirm = () => {
-    setShowModal(false);
-    if (pendingData) {
-        navigate(`/confirm?tableId=${tableId}`, {
-            replace: true,
-            state: pendingData
-        });
-    }
-};
-
+    const handleConfirm = () => {
+        setShowModal(false);
+        if (pendingData) {
+            navigate(`/confirm?tableId=${tableId}`, {
+                replace: true,
+                state: pendingData
+            });
+        }
+    };
 
     const handleCancel = () => {
         setShowModal(false);
@@ -110,6 +127,29 @@ export const CheckoutPage = () => {
                         <p className="text-red-500 mt-1 text-sm">{fullNameError}</p>
                     )}
                 </div>
+                
+                <div>
+                    <label htmlFor="payment" className="block mb-2 font-medium text-left">
+                        Payment Method
+                    </label>
+                    <select
+                        id="payment"
+                        value={payment}
+                        onBlur={validatePaymentMethode}
+                        onChange={e => setPayment(e.target.value)}
+                        className={`border rounded p-2 w-full ${paymentError ? "border-red-500" : ""}`}
+                    >
+                        <option value="">-- Select Payment Method --</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Credit Card">Credit Card</option>
+                        <option value="Debit Card">Debit Card</option>
+                    </select>
+                     {paymentError && (
+                        <p className="text-red-500 mt-1 text-sm">{paymentError}</p>
+                    )}
+                </div>
+
                 <div>
                     <label className="text-left block font-semibold mb-1">Table ID</label>
                     <input

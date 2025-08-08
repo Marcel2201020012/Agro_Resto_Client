@@ -10,6 +10,7 @@ function generateTransactionId(tableId = "XX") {
 
 function removeSessionStorage() {
     sessionStorage.removeItem("fullName");
+    sessionStorage.removeItem("payment");
     sessionStorage.removeItem("jumlah_menu");
     sessionStorage.removeItem("isSubmit");
 }
@@ -32,6 +33,7 @@ export const ConfirmationPage = () => {
     const selectedMenu = location.state?.selectedMenu || [];
     const total = location.state?.total || 0;
     const fullName = location.state?.fullName || "";
+    const payment = location.state?.payment || "";
 
     const [searchParams] = useSearchParams();
     const tableId = searchParams.get("tableId");
@@ -97,6 +99,7 @@ export const ConfirmationPage = () => {
                     body: JSON.stringify({
                         _subject: `New Order - Order ID: ${txId}`,
                         "Customer Name": fullName,
+                        "Order Time": serverTimestamp(),
                         "Order ID": txId,
                         "Table Number": tableId,
                         "Order Details": formatOrder(selectedMenu),
@@ -112,8 +115,8 @@ If you have any questions, please contact IT support.`
             }
         };
 
-        if(isSubmit !== "1"){
-            saveOrder();
+        if (isSubmit !== "1") {
+            saveOrder()
         }
 
     }, [navigate, fullName, selectedMenu, total, tableId]);
@@ -145,8 +148,18 @@ If you have any questions, please contact IT support.`
                     </div>
 
                     <div>
+                        <div className="font-bold">Table Number</div>
+                        <div>{tableId}</div>
+                    </div>
+
+                    <div>
+                        <div className="font-bold">Payment Methode</div>
+                        <div>{payment}</div>
+                    </div>
+
+                    <div>
                         <div className="font-bold">Status</div>
-                        <div>Waiting For Payment</div>
+                        <div>Waiting For Payment on Cashier</div>
                     </div>
 
                 </div>
