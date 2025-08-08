@@ -33,7 +33,7 @@ export const ConfirmationPage = () => {
     const total = location.state?.total || 0;
     const fullName = location.state?.fullName || "";
 
-    const searchParams = useSearchParams();
+    const [searchParams] = useSearchParams();
     const tableId = searchParams.get("tableId");
 
     const [transactionId, setTransactionId] = useState("");
