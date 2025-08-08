@@ -34,6 +34,9 @@ export const ConfirmationPage = () => {
     const total = location.state?.total || 0;
     const fullName = location.state?.fullName || "";
     const payment = location.state?.payment || "";
+    const now = new Date();
+    const orderTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
 
     const [searchParams] = useSearchParams();
     const tableId = searchParams.get("tableId");
@@ -46,7 +49,7 @@ export const ConfirmationPage = () => {
 
     const handleConfirm = () => {
         removeSessionStorage();
-        navigate("/menu"), { replace: true };
+        navigate(`/menu?tableId${tableId}`, { replace: true });
     }
 
     useEffect(() => {
@@ -54,7 +57,7 @@ export const ConfirmationPage = () => {
 
         if (jumlahMenu === null) {
             removeSessionStorage();
-            navigate("/menu", { replace: true });
+            navigate(`/menu?tableId${tableId}`, { replace: true });
             return;
         }
 
@@ -65,7 +68,7 @@ export const ConfirmationPage = () => {
             (typeof jumlah === "object" && !Array.isArray(jumlah) && Object.keys(jumlah).length === 0)
         ) {
             removeSessionStorage();
-            navigate("/menu", { replace: true });
+            navigate(`/menu?tableId${tableId}`, { replace: true });
             return;
         }
 
@@ -99,7 +102,7 @@ export const ConfirmationPage = () => {
                     body: JSON.stringify({
                         _subject: `New Order - Order ID: ${txId}`,
                         "Customer Name": fullName,
-                        "Order Time": serverTimestamp(),
+                        "Order Time": orderTime,
                         "Order ID": txId,
                         "Table Number": tableId,
                         "Order Details": formatOrder(selectedMenu),
