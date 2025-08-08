@@ -59,7 +59,7 @@ export const ConfirmationPage = () => {
 
             const orderData = {
                 customerName: fullName,
-                status: "waiting for payment",
+                status: "Waiting For Payment",
                 orderDetails: selectedMenu,
                 total,
                 tableId,
@@ -109,7 +109,7 @@ export const ConfirmationPage = () => {
 
                     <div>
                         <div className="font-bold">Status</div>
-                        <div>waiting for payment</div>
+                        <div>Waiting For Payment</div>
                     </div>
 
                 </div>
