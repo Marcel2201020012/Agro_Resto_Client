@@ -165,7 +165,6 @@ If you have any questions, please contact IT support.`
                     ))}
                 </div>
 
-
                 <div className="flex justify-between mt-4 border-t pt-2">
                     <p className="font-semibold">Total</p>
                     <p className="text-green-700 font-semibold">Rp{total}</p>

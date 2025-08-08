@@ -99,7 +99,7 @@ export const CheckoutPage = () => {
                 <div>
                     <label className="text-left block font-semibold mb-1">Full Name</label>
                     <input
-                        className={`w-full border p-2 rounded ${fullNameError ? "border-red-500" : "border-gray-300"}`}
+                        className={`w-full border p-2 rounded ${fullNameError ? "border-red-500" : ""}`}
                         value={fullName}
                         onChange={e => setFullName(e.target.value)}
                         onBlur={validateFullName}

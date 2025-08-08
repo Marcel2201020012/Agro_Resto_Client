@@ -81,12 +81,12 @@ export const Menu = () => {
   };
 
   if (!isLoaded) {
-        return (
-            <div className="container min-h-screen flex justify-center items-center">
-                <p className="text-lg font-semibold">Loading Menu...</p>
-            </div>
-        )
-    }
+    return (
+      <div className="container min-h-screen flex justify-center items-center">
+        <p className="text-lg font-semibold">Loading Menu...</p>
+      </div>
+    )
+  }
   const totalMenu = Object.values(jumlah).reduce((a, b) => a + b, 0);
   const selectedMenu = MenuData.filter(item => jumlah[item.id] > 0).map(item => ({ ...item, jumlah: jumlah[item.id] }));
 
@@ -94,9 +94,54 @@ export const Menu = () => {
     <div className="container min-h-screen overflow-x-hidden pt-8 pb-16">
 
       <main>
+        <h1 className="text-left text-sm text-agro-color font-semibold mb-1">MENU LIST</h1>
+        <h2 className="text-left text-2xl font-bold mb-4">Main Dish</h2>
         {/* food items section */}
-        <div className="grid grid-cols-2 gap-4 max-h-screen scrollbar-hide overflow-y-scroll">
+        <div className="grid grid-cols-2 gap-4 max-h-screen scrollbar-hide overflow-y-scroll mb-4">
           {MenuData
+            .filter(item => item.category === "Main Dish")
+            .slice() // creates a copy so the original array isn't mutated
+            .sort((a, b) => a.name.localeCompare(b.name)) // sort by name descending
+            .map((item) => (
+              <MenuCard
+                key={item.id}
+                id={item.id}
+                name={item.name}
+                price={item.price}
+                image={item.image}
+                jumlah={jumlah[item.id] || 0}
+                tambah={tambah}
+                kurang={kurang}
+              />
+            ))}
+        </div>
+
+        <h2 className="text-left text-2xl font-bold mb-4">Sides</h2>
+        {/* food items section */}
+        <div className="grid grid-cols-2 gap-4 max-h-screen scrollbar-hide overflow-y-scroll mb-4">
+          {MenuData
+            .filter(item => item.category === "Sides")
+            .slice() // creates a copy so the original array isn't mutated
+            .sort((a, b) => a.name.localeCompare(b.name)) // sort by name descending
+            .map((item) => (
+              <MenuCard
+                key={item.id}
+                id={item.id}
+                name={item.name}
+                price={item.price}
+                image={item.image}
+                jumlah={jumlah[item.id] || 0}
+                tambah={tambah}
+                kurang={kurang}
+              />
+            ))}
+        </div>
+
+        <h2 className="text-left text-2xl font-bold mb-4">Drinks</h2>
+        {/* food items section */}
+        <div className="grid grid-cols-2 gap-4 max-h-screen scrollbar-hide overflow-y-scroll mb-4">
+          {MenuData
+            .filter(item => item.category === "Drinks")
             .slice() // creates a copy so the original array isn't mutated
             .sort((a, b) => a.name.localeCompare(b.name)) // sort by name descending
             .map((item) => (
