@@ -162,7 +162,7 @@ If you have any questions, please contact IT support.`
 
                     <div>
                         <div className="font-bold">Status</div>
-                        <div>Waiting For Payment  On Cashier on Cashier</div>
+                        <div>Waiting For Payment on Cashier</div>
                     </div>
 
                 </div>
