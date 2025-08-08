@@ -98,11 +98,11 @@ export const CheckoutPage = () => {
             <div className="space-y-4">
                 <div>
                     <label className="text-left block font-semibold mb-1">Full Name</label>
-                    <textarea
+                    <input
                         className={`w-full border p-2 rounded ${fullNameError ? "border-red-500" : "border-gray-300"}`}
                         value={fullName}
                         onChange={e => setFullName(e.target.value)}
-                        onBlur={validateFullName}  // validate on blur too
+                        onBlur={validateFullName}
                     />
                     {fullNameError && (
                         <p className="text-red-500 mt-1 text-sm">{fullNameError}</p>
@@ -110,7 +110,7 @@ export const CheckoutPage = () => {
                 </div>
                 <div>
                     <label className="text-left block font-semibold mb-1">Table ID</label>
-                    <textarea
+                    <input
                         className="w-full border p-2 rounded"
                         value={tableId}
                         onChange={e => setTableId(e.target.value)}
