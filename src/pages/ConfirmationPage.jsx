@@ -92,25 +92,13 @@ export const ConfirmationPage = () => {
                     },
                     body: JSON.stringify({
                         _subject: `New Order - Order ID: ${txId}`,
-                        message: `
-Customer Name : ${fullName}
-Order ID      : ${txId}
-Table Number  : ${tableId}
-
-Order Details:
------------------------------------------------
-${formatOrder(selectedMenu)}
------------------------------------------------
-
-Total : Rp${total.toString()}
-
---------------------------------------------------
-
-This is an automated notification from Agro Resto.
-If you have any questions, please contact IT support.
-
-==================================================
-    `,
+                        "Customer Name": fullName,
+                        "Order ID": txId,
+                        "Table Number": tableId,
+                        "Order Details": formatOrder(selectedMenu),
+                        "Total": `Rp${total.toString()}`,
+                        "Notes": `This is an automated notification from Agro Resto.
+If you have any questions, please contact IT support.`
                     }),
                 });
             } catch (error) {
