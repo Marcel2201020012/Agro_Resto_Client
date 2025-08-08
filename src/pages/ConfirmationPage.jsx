@@ -108,11 +108,13 @@ If you have any questions, please contact IT support.`
             }
         };
 
-        saveOrder();
+        if(isSubmit !== "1"){
+            saveOrder();
+        }
+
     }, [navigate, fullName, selectedMenu, total, tableId]);
 
-
-    if (isSaving) {
+    if (isSaving && isSubmit !== "1") {
         return (
             <div className="container min-h-screen flex justify-center items-center">
                 <p className="text-lg font-semibold">Saving your order...</p>
