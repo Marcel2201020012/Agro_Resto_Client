@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { db } from "../../firebase/firebaseConfig";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -32,7 +32,9 @@ export const ConfirmationPage = () => {
     const selectedMenu = location.state?.selectedMenu || [];
     const total = location.state?.total || 0;
     const fullName = location.state?.fullName || "";
-    const tableId = location.state?.tableId || "00";
+
+    const searchParams = useSearchParams();
+    const tableId = searchParams.get("tableId");
 
     const [transactionId, setTransactionId] = useState("");
     const hasSaved = useRef(false);

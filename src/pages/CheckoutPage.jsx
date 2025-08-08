@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import CheckoutCard from '../components/CheckoutCard';
 import { Link } from 'react-router-dom';
@@ -13,8 +13,10 @@ export const CheckoutPage = () => {
     const [showModal, setShowModal] = useState(false);
     const [pendingData, setPendingData] = useState(null);
 
+    const [searchParams] = useSearchParams();
+    const tableId = searchParams.get("tableId");
+
     const [fullName, setFullName] = useState('');
-    const [tableId, setTableId] = useState('');
     const [fullNameError, setFullNameError] = useState("");
 
     const isFirstLoad = useRef(true);
@@ -56,7 +58,7 @@ export const CheckoutPage = () => {
   const handleConfirm = () => {
     setShowModal(false);
     if (pendingData) {
-        navigate("/confirm", {
+        navigate(`/confirm?tableId=${tableId}`, {
             replace: true,
             state: pendingData
         });
@@ -113,7 +115,6 @@ export const CheckoutPage = () => {
                     <input
                         className="w-full border p-2 rounded"
                         value={tableId}
-                        onChange={e => setTableId(e.target.value)}
                     />
                 </div>
             </div>

@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react";
 import MenuCard from "../components/MenuCard";
 //import { MenuData } from "../data/MenuData";
 import { useEffect, useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
@@ -19,6 +19,9 @@ export const Menu = () => {
   const isFirstLoad = useRef(true);
 
   const [MenuData, setMenu] = useState([]);
+
+  const [searchParams] = useSearchParams();
+  const tableId = searchParams.get("tableId");
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -159,7 +162,7 @@ export const Menu = () => {
         </div>
 
         {/* cart button */}
-        {totalMenu > 0 ? (<Link to={`/checkout`} state={{ selectedMenu }} className="fixed bottom-2 left-1/2 -translate-x-1/2 w-1/2 bg-agro-color flex justify-center rounded-full button-hover">
+        {totalMenu > 0 ? (<Link to={`/checkout?tableId=${tableId}`} state={{ selectedMenu }} className="fixed bottom-2 left-1/2 -translate-x-1/2 w-1/2 bg-agro-color flex justify-center rounded-full button-hover">
           <div className="flex space-x-2 items-center p-2 rounded-md">
             <span className="inline-flex items-center justify-center w-5.5 h-5.5 rounded-full bg-white">
               {totalMenu < 10 ? totalMenu : "9+"}
