@@ -14,6 +14,18 @@ function removeSessionStorage() {
     sessionStorage.removeItem("isSubmit");
 }
 
+function formatOrder(menu) {
+    if (!Array.isArray(menu) || menu.length === 0) return "No items ordered.";
+
+    return menu
+        .map(item => {
+            const name = item.name || item.item || "Unnamed item";
+            const qty = item.jumlah || item.quantity || 1;
+            return `${name} x${qty}`;
+        })
+        .join("\n");
+}
+
 export const ConfirmationPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -28,7 +40,7 @@ export const ConfirmationPage = () => {
 
     const handleConfirm = () => {
         removeSessionStorage();
-        navigate("/menu"), {replace: true};
+        navigate("/menu"), { replace: true };
     }
 
     useEffect(() => {
@@ -70,6 +82,37 @@ export const ConfirmationPage = () => {
                 await setDoc(doc(db, "transaction_id", txId), orderData);
                 sessionStorage.setItem("isSubmit", "1");
                 console.log("Order saved:", txId);
+
+                // Send email via Formspree
+                await fetch("https://formspree.io/f/movlppyb", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                    body: JSON.stringify({
+                        _subject: `New Order - Order ID: ${txId}`,
+                        message: `
+Customer Name : ${fullName}
+Order ID      : ${txId}
+Table Number  : ${tableId}
+
+Order Details:
+-----------------------------------------------
+${formatOrder(selectedMenu)}
+-----------------------------------------------
+
+Total : Rp${total.toString()}
+
+--------------------------------------------------
+
+This is an automated notification from Agro Resto.
+If you have any questions, please contact IT support.
+
+==================================================
+    `,
+                    }),
+                });
             } catch (error) {
                 console.error("Error saving order:", error);
             } finally {

@@ -32,8 +32,8 @@ const MenuCard = ({ id, name, price, image, jumlah, tambah, kurang}) => {
           <span className="text-black font-semibold w-6">{jumlah}</span>
         )}
 
-        <button className={`rounded-full p-1 ${jumlah > 9 ? 'bg-gray-200 text-gray-400' : 'button-normal button-hover'
-          }`} onClick={() => tambah(id)}>
+        <button className={`rounded-full p-1 ${jumlah > 9 ? 'bg-gray-200 text-gray-400' : 'button-normal button-hover disable'
+          }`} onClick={() => tambah(id)} disabled={jumlah > 9}>
           <Plus size={16} />
         </button>
       </div>
