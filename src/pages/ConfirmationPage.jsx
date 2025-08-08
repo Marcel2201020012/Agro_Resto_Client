@@ -77,7 +77,7 @@ export const ConfirmationPage = () => {
 
             const orderData = {
                 customerName: fullName,
-                status: "Waiting For Payment",
+                status: "Waiting For Payment On Cashier",
                 orderDetails: selectedMenu,
                 total,
                 tableId,
@@ -159,7 +159,7 @@ If you have any questions, please contact IT support.`
 
                     <div>
                         <div className="font-bold">Status</div>
-                        <div>Waiting For Payment on Cashier</div>
+                        <div>Waiting For Payment  On Cashier on Cashier</div>
                     </div>
 
                 </div>
