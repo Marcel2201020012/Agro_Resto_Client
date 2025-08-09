@@ -37,7 +37,6 @@ export const ConfirmationPage = () => {
     const now = new Date();
     const orderTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
-
     const [searchParams] = useSearchParams();
     const tableId = searchParams.get("tableId");
 
@@ -84,7 +83,8 @@ export const ConfirmationPage = () => {
                 orderDetails: selectedMenu,
                 total,
                 tableId,
-                createdAt: serverTimestamp()
+                createdAt: serverTimestamp(),
+                payment
             };
 
             try {
@@ -122,7 +122,7 @@ If you have any questions, please contact IT support.`
             saveOrder()
         }
 
-    }, [navigate, fullName, selectedMenu, total, tableId]);
+    }, [navigate, fullName, selectedMenu, total, tableId, payment]);
 
     if (isSaving && isSubmit !== "1") {
         return (
