@@ -67,7 +67,7 @@ export const ConfirmationPage = () => {
             (typeof jumlah === "object" && !Array.isArray(jumlah) && Object.keys(jumlah).length === 0)
         ) {
             removeSessionStorage();
-            navigate(`/menu?tableId${tableId}`, { replace: true });
+            navigate(`/menu?tableId=${tableId}`, { replace: true });
             return;
         }
 
