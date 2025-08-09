@@ -48,7 +48,7 @@ export const ConfirmationPage = () => {
 
     const handleConfirm = () => {
         removeSessionStorage();
-        navigate(`/menu?tableId${tableId}`, { replace: true });
+        navigate(`/menu?tableId=${tableId}`, { replace: true });
     }
 
     useEffect(() => {
@@ -56,7 +56,7 @@ export const ConfirmationPage = () => {
 
         if (jumlahMenu === null) {
             removeSessionStorage();
-            navigate(`/menu?tableId${tableId}`, { replace: true });
+            navigate(`/menu?tableId=${tableId}`, { replace: true });
             return;
         }
 
