@@ -110,6 +110,7 @@ export const Menu = () => {
                 key={item.id}
                 id={item.id}
                 name={item.name}
+                cn={item.cn}
                 price={item.price}
                 image={item.image}
                 jumlah={jumlah[item.id] || 0}
@@ -131,6 +132,7 @@ export const Menu = () => {
                 key={item.id}
                 id={item.id}
                 name={item.name}
+                cn={item.cn}
                 price={item.price}
                 image={item.image}
                 jumlah={jumlah[item.id] || 0}
@@ -152,6 +154,7 @@ export const Menu = () => {
                 key={item.id}
                 id={item.id}
                 name={item.name}
+                cn={item.cn}
                 price={item.price}
                 image={item.image}
                 jumlah={jumlah[item.id] || 0}
