@@ -105,20 +105,38 @@ export const CheckoutPage = () => {
             window.snap.pay(data.token, {
                 onSuccess: (result) => {
                     console.log("Payment Success:", result);
+                    const newPendingData = {
+                        fullName,
+                        selectedMenu,
+                        total,
+                        transaction_id,
+                        status: "Preparing Food"
+                    };
+
                     setStatus("Preparing Food");
-                    setPendingData({ fullName, selectedMenu, total, transaction_id, status });
+                    setPendingData(newPendingData);
+
                     navigate(`/confirm?tableId=${tableId}`, {
                         replace: true,
-                        state: pendingData
+                        state: newPendingData
                     });
                 },
                 onPending: (result) => {
                     console.log("Payment Pending:", result);
+                    const newPendingData = {
+                        fullName,
+                        selectedMenu,
+                        total,
+                        transaction_id,
+                        status: "Waiting For Payment on Cashier"
+                    };
+
                     setStatus("Waiting For Payment on Cashier");
-                    setPendingData({ fullName, selectedMenu, total, transaction_id, status });
+                    setPendingData(newPendingData);
+                  
                     navigate(`/confirm?tableId=${tableId}`, {
                         replace: true,
-                        state: pendingData
+                        state: newPendingData
                     });
                 },
                 onError: (result) => {

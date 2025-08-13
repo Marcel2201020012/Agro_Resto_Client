@@ -15,7 +15,7 @@ const MenuCard = ({ id, name, cn, price, image, jumlah, tambah, kurang }) => {
           <h3 className="text-black text-sm font-medium">{name}</h3>
           <h3 className="text-black text-sm font-medium">{cn}</h3>
           <p className="text-red-500 text-sm font-semibold">
-            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(price)}
+            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)}
           </p>
         </div>
       </div>
