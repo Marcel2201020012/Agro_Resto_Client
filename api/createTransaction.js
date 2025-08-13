@@ -25,6 +25,7 @@ export default async function handler(req, res) {
     };
 
     const transaction = await snap.createTransaction(parameter);
+    console.log(transaction);
     res.status(200).json({ token: transaction.token });
   } catch (err) {
     res.status(500).json({ error: err.message });
