@@ -89,7 +89,7 @@ export const CheckoutPage = () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     order: transaction_id,
-                    amount: pendingData.total,
+                    amount: 10000,
                     name: pendingData.fullName,
                 }),
             });
