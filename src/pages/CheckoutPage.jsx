@@ -91,7 +91,6 @@ export const CheckoutPage = () => {
                     order: transaction_id,
                     amount: pendingData.total,
                     name: pendingData.fullName,
-                    email: "test@gmail.com"
                 }),
             });
 
