@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
     const parameter = {
       transaction_details: {
-        order_id: orderId,
+        order_id: `ORDER-${Date.now()}-${Math.floor(Math.random()*1000)}`,
         gross_amount: amount,
       },
       credit_card: { secure: true },
