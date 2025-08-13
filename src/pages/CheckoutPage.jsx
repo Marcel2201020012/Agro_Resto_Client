@@ -48,8 +48,8 @@ export const CheckoutPage = () => {
             return;
         }
         sessionStorage.setItem("fullName", JSON.stringify(fullName));
-        sessionStorage.setItem("payment", JSON.stringify(payment));
-    }, [fullName, payment]);
+        // sessionStorage.setItem("payment", JSON.stringify(payment));
+    }, [fullName]);
 
     const validateFullName = () => {
         if (fullName.trim().length < 3) {
