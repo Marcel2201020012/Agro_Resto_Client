@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { amount, name, email } = req.body;
+  const { orderId, amount, name, email } = req.body;
 
   try {
     // Inisialisasi Midtrans Snap
@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
     const parameter = {
       transaction_details: {
-        order_id: "ORDER-" + Date.now(),
+        order_id: orderId,
         gross_amount: amount,
       },
       credit_card: { secure: true },

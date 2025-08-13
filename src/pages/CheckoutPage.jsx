@@ -1,7 +1,11 @@
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import CheckoutCard from '../components/CheckoutCard';
-import { Link } from 'react-router-dom';
+
+function generateTransactionId(tableId = "XX") {
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+    return `AR-${tableId}-${random}`;
+}
 
 export const CheckoutPage = () => {
     const location = useLocation();
@@ -21,6 +25,7 @@ export const CheckoutPage = () => {
 
     const [payment, setPayment] = useState("");
     const [paymentError, setPaymentError] = useState("");
+    const transaction_id = generateTransactionId(tableId);
 
     const isFirstLoad = useRef(true);
 
@@ -68,7 +73,7 @@ export const CheckoutPage = () => {
 
         if (!validateFullName() || !validatePaymentMethode()) return;
 
-        setPendingData({ fullName, selectedMenu, total, payment });
+        setPendingData({ fullName, selectedMenu, total, payment, transaction_id});
 
         setShowModal(true);
     };
@@ -79,13 +84,14 @@ export const CheckoutPage = () => {
         if (!pendingData) return;
 
         try {
-            // 1️⃣ Panggil backend untuk generate Snap token
             const res = await fetch("/api/createTransaction", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    amount: pendingData.total,   // total harga
-                    name: pendingData.fullName,      // nama customer
+                    order: transaction_id,
+                    amount: pendingData.total,
+                    name: pendingData.fullName,
+                    email: "test@gmail.com"
                 }),
             });
 
@@ -93,11 +99,9 @@ export const CheckoutPage = () => {
 
             if (!data.token) throw new Error("Gagal mendapatkan token Midtrans");
 
-            // 2️⃣ Panggil Snap popup
             window.snap.pay(data.token, {
                 onSuccess: (result) => {
                     console.log("Payment Success:", result);
-                    // 3️⃣ Setelah sukses, arahkan ke halaman konfirmasi
                     navigate(`/confirm?tableId=${tableId}`, {
                         replace: true,
                         state: pendingData
@@ -105,7 +109,6 @@ export const CheckoutPage = () => {
                 },
                 onPending: (result) => {
                     console.log("Payment Pending:", result);
-                    // Bisa tetap arahkan ke confirm atau tampilkan info pending
                     navigate(`/confirm?tableId=${tableId}`, {
                         replace: true,
                         state: pendingData

@@ -3,11 +3,6 @@ import { useEffect, useState, useRef } from "react";
 import { db } from "../../firebase/firebaseConfig";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
-function generateTransactionId(tableId = "XX") {
-    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-    return `AR-${tableId}-${random}`;
-}
-
 function removeSessionStorage() {
     sessionStorage.removeItem("fullName");
     sessionStorage.removeItem("payment");
@@ -34,13 +29,14 @@ export const ConfirmationPage = () => {
     const total = location.state?.total || 0;
     const fullName = location.state?.fullName || "";
     const payment = location.state?.payment || "";
+    const transaction_id = location.state?.transactionId || "";
+
     const now = new Date();
     const orderTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
     const [searchParams] = useSearchParams();
     const tableId = searchParams.get("tableId");
 
-    const [transactionId, setTransactionId] = useState("");
     const hasSaved = useRef(false);
     const [isSaving, setIsSaving] = useState(true);
 
@@ -74,8 +70,7 @@ export const ConfirmationPage = () => {
         const saveOrder = async () => {
             if (hasSaved.current) return;
             hasSaved.current = true;
-            const txId = generateTransactionId(tableId);
-            setTransactionId(txId);
+            const txId = transaction_id;
 
             const orderData = {
                 customerName: fullName,
