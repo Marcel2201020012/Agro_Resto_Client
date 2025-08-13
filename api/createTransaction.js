@@ -8,9 +8,8 @@ export default async function handler(req, res) {
   const { order, amount, name, email } = req.body;
 
   try {
-    // Inisialisasi Midtrans Snap
     let snap = new midtransClient.Snap({
-      isProduction: false, // Sandbox dulu
+      isProduction: false,
       serverKey: process.env.MIDTRANS_SERVER_KEY_SANDBOX,
     });
 
@@ -22,7 +21,6 @@ export default async function handler(req, res) {
       credit_card: { secure: true },
       customer_details: {
         first_name: name,
-        email: email,
       },
     };
 
