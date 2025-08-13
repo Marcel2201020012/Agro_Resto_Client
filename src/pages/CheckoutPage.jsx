@@ -84,6 +84,7 @@ export const CheckoutPage = () => {
         if (!pendingData) return;
 
         try {
+            console.log(transaction_id)
             const res = await fetch("/api/createTransaction", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
