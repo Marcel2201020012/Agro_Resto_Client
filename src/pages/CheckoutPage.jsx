@@ -153,7 +153,6 @@ export const CheckoutPage = () => {
 
     const handleCancel = () => {
         setShowModal(false);
-        setPendingData(null);
     };
 
     return (
