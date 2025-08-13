@@ -10,24 +10,23 @@ function generateTransactionId(tableId = "XX") {
 export const CheckoutPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const selectedMenu = location.state?.selectedMenu || [];
+    const isFirstLoad = useRef(true);
 
+    const [searchParams] = useSearchParams();
+
+    const selectedMenu = location.state?.selectedMenu || [];
     const total = selectedMenu.reduce((acc, item) => acc + item.price * item.jumlah, 0);
+    const tableId = searchParams.get("tableId");
+    const transaction_id = generateTransactionId(tableId);
 
     const [showModal, setShowModal] = useState(false);
     const [pendingData, setPendingData] = useState(null);
-
-    const [searchParams] = useSearchParams();
-    const tableId = searchParams.get("tableId");
 
     const [fullName, setFullName] = useState('');
     const [fullNameError, setFullNameError] = useState("");
 
     const [payment, setPayment] = useState("");
     const [paymentError, setPaymentError] = useState("");
-    const transaction_id = generateTransactionId(tableId);
-
-    const isFirstLoad = useRef(true);
 
     useEffect(() => {
         const userName = sessionStorage.getItem("fullName");
@@ -73,7 +72,7 @@ export const CheckoutPage = () => {
 
         if (!validateFullName() || !validatePaymentMethode()) return;
 
-        setPendingData({ fullName, selectedMenu, total, payment, transaction_id});
+        setPendingData({ fullName, selectedMenu, total, payment, transaction_id });
 
         setShowModal(true);
     };
@@ -84,13 +83,21 @@ export const CheckoutPage = () => {
         if (!pendingData) return;
 
         try {
+            const foodItems = selectedMenu.map(item => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                jumlah: item.jumlah
+            }));
+
             const res = await fetch("/api/createTransaction", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     order: transaction_id,
-                    amount: 10000,
+                    amount: total,
                     name: pendingData.fullName,
+                    items: foodItems,
                 }),
             });
 

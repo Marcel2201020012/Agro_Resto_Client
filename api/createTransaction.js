@@ -5,7 +5,12 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { order, amount, name, email } = req.body;
+  const { order, amount, name, items } = req.body;
+  const item_details = items.map(item => ({
+    price: item.price,
+    quantity: item.jumlah,
+    name: item.name,
+  }));
 
   try {
     let snap = new midtransClient.Snap({
@@ -22,6 +27,7 @@ export default async function handler(req, res) {
       customer_details: {
         first_name: name,
       },
+      item_details: item_details
     };
 
     const transaction = await snap.createTransaction(parameter);
