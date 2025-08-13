@@ -11,6 +11,7 @@ export const CheckoutPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const isFirstLoad = useRef(true);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const [searchParams] = useSearchParams();
 
@@ -20,15 +21,12 @@ export const CheckoutPage = () => {
     const transaction_id = generateTransactionId(tableId);
 
     const [showModal, setShowModal] = useState(false);
-    const [pendingData, setPendingData] = useState(null);
 
     const [fullName, setFullName] = useState('');
     const [fullNameError, setFullNameError] = useState("");
 
     // const [payment, setPayment] = useState("");
     // const [paymentError, setPaymentError] = useState("");
-
-    const [status, setStatus] = useState("");
 
     useEffect(() => {
         const userName = sessionStorage.getItem("fullName");
@@ -71,13 +69,13 @@ export const CheckoutPage = () => {
 
     const handleNextClick = (e) => {
         e.preventDefault();
-
         if (!validateFullName()) return;
         setShowModal(true);
     };
 
     const handleConfirm = async () => {
         setShowModal(false);
+        setIsProcessing(true);
 
         try {
             const foodItems = selectedMenu.map(item => ({
@@ -100,7 +98,10 @@ export const CheckoutPage = () => {
 
             const data = await res.json();
 
-            if (!data.token) throw new Error("Gagal mendapatkan token Midtrans");
+            if (!data.token) {
+                setIsProcessing(false);
+                throw new Error("Gagal mendapatkan token Midtrans");
+            }
 
             window.snap.pay(data.token, {
                 onSuccess: (result) => {
@@ -112,9 +113,6 @@ export const CheckoutPage = () => {
                         transaction_id,
                         status: "Preparing Food"
                     };
-
-                    setStatus("Preparing Food");
-                    setPendingData(newPendingData);
 
                     navigate(`/confirm?tableId=${tableId}`, {
                         replace: true,
@@ -128,12 +126,9 @@ export const CheckoutPage = () => {
                         selectedMenu,
                         total,
                         transaction_id,
-                        status: "Waiting For Payment on Cashier"
+                        status: "Waiting For Payment On Cashier"
                     };
 
-                    setStatus("Waiting For Payment on Cashier");
-                    setPendingData(newPendingData);
-                  
                     navigate(`/confirm?tableId=${tableId}`, {
                         replace: true,
                         state: newPendingData
@@ -151,6 +146,8 @@ export const CheckoutPage = () => {
         } catch (err) {
             console.error(err);
             alert("Terjadi kesalahan saat memproses pembayaran");
+        } finally {
+            setIsProcessing(false);
         }
     };
 
@@ -235,15 +232,19 @@ export const CheckoutPage = () => {
             <div className="flex justify-between mt-10">
                 <button
                     onClick={() => navigate(-1)}
-                    className="bg-agro-color text-white px-6 py-2 rounded-full"
+                    disabled={isProcessing}
+                    className={`bg-agro-color text-white px-6 py-2 rounded-full ${isProcessing ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                 >
                     Back
                 </button>
                 <button
                     onClick={handleNextClick}
-                    className="bg-agro-color rounded-full text-white px-6 py-2 flex"
+                    disabled={isProcessing}
+                    className={`bg-agro-color rounded-full text-white px-6 py-2 flex ${isProcessing ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                 >
-                    Next
+                    {isProcessing ? "Processing..." : "Pay Now"}
                 </button>
             </div>
 
@@ -268,6 +269,12 @@ export const CheckoutPage = () => {
                             </button>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {isProcessing && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                    <div className="text-white text-lg">Loading...</div>
                 </div>
             )}
         </div>
