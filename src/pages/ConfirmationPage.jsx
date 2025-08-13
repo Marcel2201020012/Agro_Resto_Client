@@ -29,7 +29,7 @@ export const ConfirmationPage = () => {
     const total = location.state?.total || 0;
     const fullName = location.state?.fullName || "";
     const payment = location.state?.payment || "";
-    const transaction_id = location.state?.transactionId || "";
+    const transaction_id = location.state?.transaction_id || "";
 
     const now = new Date();
     const orderTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;

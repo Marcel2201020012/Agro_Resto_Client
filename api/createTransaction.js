@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { order, amount, name, email } = req.body;
+  const { order, amount, name} = req.body;
 
   try {
     let snap = new midtransClient.Snap({
@@ -25,7 +25,6 @@ export default async function handler(req, res) {
     };
 
     const transaction = await snap.createTransaction(parameter);
-    console.log(transaction, order);
     res.status(200).json({ token: transaction.token });
   } catch (err) {
     res.status(500).json({ error: err.message });
