@@ -148,14 +148,14 @@ export const ConfirmationPage = () => {
                         <div>{tableId}</div>
                     </div>
 
-                    <div>
+                    {/* <div>
                         <div className="font-bold">Payment Methode</div>
                         <div>{payment}</div>
-                    </div>
+                    </div> */}
 
                     <div>
                         <div className="font-bold">Status</div>
-                        <div>Waiting For Payment on Cashier {status}</div>
+                        <div>{status}</div>
                     </div>
 
                 </div>
