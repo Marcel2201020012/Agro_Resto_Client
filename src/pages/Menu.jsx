@@ -1,6 +1,5 @@
 import { ArrowRight } from "lucide-react";
 import MenuCard from "../components/MenuCard";
-//import { MenuData } from "../data/MenuData";
 import { useEffect, useState, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
@@ -11,6 +10,34 @@ function removeSessionStorage() {
   sessionStorage.removeItem("fullName");
   sessionStorage.setItem("jumlah_menu", "");
   sessionStorage.removeItem("isSubmit");
+}
+
+function MenuCategory({ category, title, MenuData, jumlah, tambah, kurang }) {
+  const filteredItems = MenuData
+    .filter(item => item.category === category)
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  return (
+    <>
+      <h2 className="text-left text-2xl font-bold mb-4">{title}</h2>
+      <div className="grid grid-cols-2 gap-4 max-h-screen scrollbar-hide overflow-y-scroll mb-4">
+        {filteredItems.map(item => (
+          <MenuCard
+            key={item.id}
+            id={item.id}
+            name={item.name}
+            cn={item.cn}
+            price={item.price}
+            image={item.image}
+            jumlah={jumlah[item.id] || 0}
+            tambah={tambah}
+            kurang={kurang}
+          />
+        ))}
+      </div>
+    </>
+  );
 }
 
 export const Menu = () => {
@@ -98,71 +125,77 @@ export const Menu = () => {
 
       <main>
         <h1 className="text-left text-sm text-agro-color font-semibold mb-1">MENU LIST</h1>
-        <h2 className="text-left text-2xl font-bold mb-4">Main Dish</h2>
-        {/* food items section */}
-        <div className="grid grid-cols-2 gap-4 max-h-screen scrollbar-hide overflow-y-scroll mb-4">
-          {MenuData
-            .filter(item => item.category === "Main Dish")
-            .slice() // creates a copy so the original array isn't mutated
-            .sort((a, b) => a.name.localeCompare(b.name)) // sort by name descending
-            .map((item) => (
-              <MenuCard
-                key={item.id}
-                id={item.id}
-                name={item.name}
-                cn={item.cn}
-                price={item.price}
-                image={item.image}
-                jumlah={jumlah[item.id] || 0}
-                tambah={tambah}
-                kurang={kurang}
-              />
-            ))}
-        </div>
+        <MenuCategory
+          category="Main Dish"
+          title="Main Dish"
+          MenuData={MenuData}
+          jumlah={jumlah}
+          tambah={tambah}
+          kurang={kurang}
+        />
 
-        <h2 className="text-left text-2xl font-bold mb-4">Sides</h2>
-        {/* food items section */}
-        <div className="grid grid-cols-2 gap-4 max-h-screen scrollbar-hide overflow-y-scroll mb-4">
-          {MenuData
-            .filter(item => item.category === "Sides")
-            .slice() // creates a copy so the original array isn't mutated
-            .sort((a, b) => a.name.localeCompare(b.name)) // sort by name descending
-            .map((item) => (
-              <MenuCard
-                key={item.id}
-                id={item.id}
-                name={item.name}
-                cn={item.cn}
-                price={item.price}
-                image={item.image}
-                jumlah={jumlah[item.id] || 0}
-                tambah={tambah}
-                kurang={kurang}
-              />
-            ))}
-        </div>
+        <MenuCategory
+          category="Sides"
+          title="Sides"
+          MenuData={MenuData}
+          jumlah={jumlah}
+          tambah={tambah}
+          kurang={kurang}
+        />
 
-        <h2 className="text-left text-2xl font-bold mb-4">Drinks</h2>
-        {/* food items section */}
-        <div className="grid grid-cols-2 gap-4 max-h-screen scrollbar-hide overflow-y-scroll mb-4">
-          {MenuData
-            .filter(item => item.category === "Drinks")
-            .slice() // creates a copy so the original array isn't mutated
-            .sort((a, b) => a.name.localeCompare(b.name)) // sort by name descending
-            .map((item) => (
-              <MenuCard
-                key={item.id}
-                id={item.id}
-                name={item.name}
-                cn={item.cn}
-                price={item.price}
-                image={item.image}
-                jumlah={jumlah[item.id] || 0}
-                tambah={tambah}
-                kurang={kurang}
-              />
-            ))}
-        </div>
+        <MenuCategory
+          category="Coffee"
+          title="Coffee"
+          MenuData={MenuData}
+          jumlah={jumlah}
+          tambah={tambah}
+          kurang={kurang}
+        />
+
+        <MenuCategory
+          category="Non-Coffee"
+          title="Non-Coffee"
+          MenuData={MenuData}
+          jumlah={jumlah}
+          tambah={tambah}
+          kurang={kurang}
+        />
+
+        <MenuCategory
+          category="Juice"
+          title="Juice"
+          MenuData={MenuData}
+          jumlah={jumlah}
+          tambah={tambah}
+          kurang={kurang}
+        />
+
+        <MenuCategory
+          category="Tea"
+          title="Tea"
+          MenuData={MenuData}
+          jumlah={jumlah}
+          tambah={tambah}
+          kurang={kurang}
+        />
+
+        <MenuCategory
+          category="Soft Drink"
+          title="Soft Drinks"
+          MenuData={MenuData}
+          jumlah={jumlah}
+          tambah={tambah}
+          kurang={kurang}
+        />
+
+        <MenuCategory
+          category="Beer"
+          title="Beer"
+          MenuData={MenuData}
+          jumlah={jumlah}
+          tambah={tambah}
+          kurang={kurang}
+        />
 
         {/* cart button */}
         {totalMenu > 0 ? (<Link to={`/checkout?tableId=${tableId}`} state={{ selectedMenu }} className="fixed bottom-2 left-1/2 -translate-x-1/2 w-1/2 bg-agro-color flex justify-center rounded-full button-hover">
