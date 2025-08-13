@@ -79,8 +79,6 @@ export const CheckoutPage = () => {
     const handleConfirm = async () => {
         setShowModal(false);
 
-        if (!pendingData) return;
-
         try {
             const foodItems = selectedMenu.map(item => ({
                 id: item.id,

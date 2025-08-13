@@ -1,6 +1,6 @@
 import { Minus, Plus } from 'lucide-react';
 
-const MenuCard = ({ id, name, cn, price, image, jumlah, tambah, kurang}) => {
+const MenuCard = ({ id, name, cn, price, image, jumlah, tambah, kurang }) => {
   return (
     <div className="relative bg-white rounded-xl shadow-lg p-4">
       <div className="lg:flex">
@@ -14,7 +14,9 @@ const MenuCard = ({ id, name, cn, price, image, jumlah, tambah, kurang}) => {
         <div className="mt-4 text-left">
           <h3 className="text-black text-sm font-medium">{name}</h3>
           <h3 className="text-black text-sm font-medium">{cn}</h3>
-          <p className="text-red-500 text-sm font-semibold">Rp{price}</p>
+          <p className="text-red-500 text-sm font-semibold">
+            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(price)}
+          </p>
         </div>
       </div>
 
