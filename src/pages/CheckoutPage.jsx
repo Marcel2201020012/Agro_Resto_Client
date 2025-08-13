@@ -55,9 +55,9 @@ export const CheckoutPage = () => {
     };
 
     const validatePaymentMethode = () => {
-        if (payment === ""){
-             setPaymentError("Please choose a payment methode.");
-             return false;
+        if (payment === "") {
+            setPaymentError("Please choose a payment methode.");
+            return false;
         }
         setPaymentError("");
         return true;
@@ -73,13 +73,57 @@ export const CheckoutPage = () => {
         setShowModal(true);
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         setShowModal(false);
-        if (pendingData) {
-            navigate(`/confirm?tableId=${tableId}`, {
-                replace: true,
-                state: pendingData
+
+        if (!pendingData) return;
+
+        try {
+            // 1️⃣ Panggil backend untuk generate Snap token
+            const res = await fetch("/api/createTransaction", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    amount: pendingData.total,   // total harga
+                    name: pendingData.name,      // nama customer
+                    email: pendingData.email     // email customer
+                }),
             });
+
+            const data = await res.json();
+
+            if (!data.token) throw new Error("Gagal mendapatkan token Midtrans");
+
+            // 2️⃣ Panggil Snap popup
+            window.snap.pay(data.token, {
+                onSuccess: (result) => {
+                    console.log("Payment Success:", result);
+                    // 3️⃣ Setelah sukses, arahkan ke halaman konfirmasi
+                    navigate(`/confirm?tableId=${tableId}`, {
+                        replace: true,
+                        state: pendingData
+                    });
+                },
+                onPending: (result) => {
+                    console.log("Payment Pending:", result);
+                    // Bisa tetap arahkan ke confirm atau tampilkan info pending
+                    navigate(`/confirm?tableId=${tableId}`, {
+                        replace: true,
+                        state: pendingData
+                    });
+                },
+                onError: (result) => {
+                    console.error("Payment Error:", result);
+                    alert("Payment gagal, silakan coba lagi.");
+                },
+                onClose: () => {
+                    console.log("Payment popup ditutup tanpa membayar");
+                }
+            });
+
+        } catch (err) {
+            console.error(err);
+            alert("Terjadi kesalahan saat memproses pembayaran");
         }
     };
 
@@ -127,7 +171,7 @@ export const CheckoutPage = () => {
                         <p className="text-red-500 mt-1 text-sm">{fullNameError}</p>
                     )}
                 </div>
-                
+
                 <div>
                     <label htmlFor="payment" className="block mb-2 font-medium text-left">
                         Payment Method
@@ -145,7 +189,7 @@ export const CheckoutPage = () => {
                         <option value="Credit Card">Credit Card</option>
                         <option value="Debit Card">Debit Card</option>
                     </select>
-                     {paymentError && (
+                    {paymentError && (
                         <p className="text-red-500 mt-1 text-sm">{paymentError}</p>
                     )}
                 </div>
