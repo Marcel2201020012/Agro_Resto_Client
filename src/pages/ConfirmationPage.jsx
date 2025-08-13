@@ -137,7 +137,7 @@ If you have any questions, please contact IT support.`
 
                     <div>
                         <div className="font-bold">Transcation ID</div>
-                        <div>{transactionId}</div>
+                        <div>{transaction_id}</div>
                     </div>
 
                     <div>
