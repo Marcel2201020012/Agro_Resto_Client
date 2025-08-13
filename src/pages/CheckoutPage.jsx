@@ -85,8 +85,7 @@ export const CheckoutPage = () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     amount: pendingData.total,   // total harga
-                    name: pendingData.name,      // nama customer
-                    email: pendingData.email     // email customer
+                    name: pendingData.fullName,      // nama customer
                 }),
             });
 
