@@ -28,11 +28,9 @@ export const ConfirmationPage = () => {
     const selectedMenu = location.state?.selectedMenu || [];
     const total = location.state?.total || 0;
     const fullName = location.state?.fullName || "";
-    const payment = location.state?.payment || "";
+    // const payment = location.state?.payment || "";
     const transaction_id = location.state?.transaction_id || "";
-
-    const now = new Date();
-    const orderTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    const status = location.state?.status || "";
 
     const [searchParams] = useSearchParams();
     const tableId = searchParams.get("tableId");
@@ -74,12 +72,12 @@ export const ConfirmationPage = () => {
 
             const orderData = {
                 customerName: fullName,
-                status: "Waiting For Payment On Cashier",
+                status: status,
                 orderDetails: selectedMenu,
-                total,
-                tableId,
+                total: total,
+                tableId: tableId,
                 createdAt: serverTimestamp(),
-                payment
+                // payment: payment
             };
 
             try {
@@ -88,24 +86,24 @@ export const ConfirmationPage = () => {
                 console.log("Order saved:", txId);
 
                 // Send email via Formspree
-                await fetch("https://formspree.io/f/movlppyb", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Accept: "application/json",
-                    },
-                    body: JSON.stringify({
-                        _subject: `New Order - Order ID: ${txId}`,
-                        "Customer Name": fullName,
-                        "Order Time": orderTime,
-                        "Order ID": txId,
-                        "Table Number": tableId,
-                        "Order Details": formatOrder(selectedMenu),
-                        "Total": `Rp${total.toString()}`,
-                        "Notes": `This is an automated notification from Agro Resto.
-If you have any questions, please contact IT support.`
-                    }),
-                });
+//                 await fetch("https://formspree.io/f/movlppyb", {
+//                     method: "POST",
+//                     headers: {
+//                         "Content-Type": "application/json",
+//                         Accept: "application/json",
+//                     },
+//                     body: JSON.stringify({
+//                         _subject: `New Order - Order ID: ${txId}`,
+//                         "Customer Name": fullName,
+//                         "Order Time": orderTime,
+//                         "Order ID": txId,
+//                         "Table Number": tableId,
+//                         "Order Details": formatOrder(selectedMenu),
+//                         "Total": `Rp${total.toString()}`,
+//                         "Notes": `This is an automated notification from Agro Resto.
+// If you have any questions, please contact IT support.`
+//                     }),
+//                 });
             } catch (error) {
                 console.error("Error saving order:", error);
             } finally {
@@ -117,7 +115,7 @@ If you have any questions, please contact IT support.`
             saveOrder()
         }
 
-    }, [navigate, fullName, selectedMenu, total, tableId, payment]);
+    }, [navigate, fullName, selectedMenu, total, tableId, status]);
 
     if (isSaving && isSubmit !== "1") {
         return (
@@ -157,7 +155,7 @@ If you have any questions, please contact IT support.`
 
                     <div>
                         <div className="font-bold">Status</div>
-                        <div>Waiting For Payment on Cashier</div>
+                        <div>Waiting For Payment on Cashier {status}</div>
                     </div>
 
                 </div>

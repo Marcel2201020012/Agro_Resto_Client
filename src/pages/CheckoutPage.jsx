@@ -25,8 +25,10 @@ export const CheckoutPage = () => {
     const [fullName, setFullName] = useState('');
     const [fullNameError, setFullNameError] = useState("");
 
-    const [payment, setPayment] = useState("");
-    const [paymentError, setPaymentError] = useState("");
+    // const [payment, setPayment] = useState("");
+    // const [paymentError, setPaymentError] = useState("");
+
+    const [status, setStatus] = useState("");
 
     useEffect(() => {
         const userName = sessionStorage.getItem("fullName");
@@ -34,10 +36,10 @@ export const CheckoutPage = () => {
             setFullName(JSON.parse(userName));
         }
 
-        const payment = sessionStorage.getItem("payment");
-        if (payment) {
-            setPayment(JSON.parse(payment));
-        }
+        // const payment = sessionStorage.getItem("payment");
+        // if (payment) {
+        //     setPayment(JSON.parse(payment));
+        // }
     }, []);
 
     useEffect(() => {
@@ -58,22 +60,19 @@ export const CheckoutPage = () => {
         return true;
     };
 
-    const validatePaymentMethode = () => {
-        if (payment === "") {
-            setPaymentError("Please choose a payment methode.");
-            return false;
-        }
-        setPaymentError("");
-        return true;
-    }
+    // const validatePaymentMethode = () => {
+    //     if (payment === "") {
+    //         setPaymentError("Please choose a payment methode.");
+    //         return false;
+    //     }
+    //     setPaymentError("");
+    //     return true;
+    // }
 
     const handleNextClick = (e) => {
         e.preventDefault();
 
-        if (!validateFullName() || !validatePaymentMethode()) return;
-
-        setPendingData({ fullName, selectedMenu, total, payment, transaction_id });
-
+        if (!validateFullName()) return;
         setShowModal(true);
     };
 
@@ -96,7 +95,7 @@ export const CheckoutPage = () => {
                 body: JSON.stringify({
                     order: transaction_id,
                     amount: total,
-                    name: pendingData.fullName,
+                    name: fullName,
                     items: foodItems,
                 }),
             });
@@ -108,6 +107,8 @@ export const CheckoutPage = () => {
             window.snap.pay(data.token, {
                 onSuccess: (result) => {
                     console.log("Payment Success:", result);
+                    setStatus("Preparing Food");
+                    setPendingData({ fullName, selectedMenu, total, transaction_id, status });
                     navigate(`/confirm?tableId=${tableId}`, {
                         replace: true,
                         state: pendingData
@@ -115,6 +116,8 @@ export const CheckoutPage = () => {
                 },
                 onPending: (result) => {
                     console.log("Payment Pending:", result);
+                    setStatus("Waiting For Payment on Cashier");
+                    setPendingData({ fullName, selectedMenu, total, transaction_id, status });
                     navigate(`/confirm?tableId=${tableId}`, {
                         replace: true,
                         state: pendingData
@@ -180,7 +183,7 @@ export const CheckoutPage = () => {
                     )}
                 </div>
 
-                <div>
+                {/* <div>
                     <label htmlFor="payment" className="block mb-2 font-medium text-left">
                         Payment Method
                     </label>
@@ -200,13 +203,14 @@ export const CheckoutPage = () => {
                     {paymentError && (
                         <p className="text-red-500 mt-1 text-sm">{paymentError}</p>
                     )}
-                </div>
+                </div> */}
 
                 <div>
                     <label className="text-left block font-semibold mb-1">Table ID</label>
                     <input
                         className="w-full border p-2 rounded"
                         value={tableId}
+                        readOnly={true}
                     />
                 </div>
             </div>
