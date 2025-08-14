@@ -80,14 +80,13 @@ export const ConfirmationPage = () => {
 
                 setStatus(newStatus);
 
-                // Save order AFTER knowing the status
                 if (!hasSaved.current && isSubmit !== "1") {
                     hasSaved.current = true;
                     const txId = transaction_id;
 
                     const orderData = {
                         customerName: fullName,
-                        status: newStatus, // ← correct status
+                        status: newStatus,
                         orderDetails: selectedMenu,
                         total: total,
                         tableId: tableId,
