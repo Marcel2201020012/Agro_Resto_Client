@@ -1,7 +1,7 @@
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import { db } from "../../firebase/firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc} from "firebase/firestore";
 
 function removeSessionStorage() {
     sessionStorage.removeItem("fullName");
@@ -41,6 +41,13 @@ export const ConfirmationPage = () => {
         } else {
             (async () => {
                 try {
+                    const docRef = doc(db, "transaction_id", orderId);
+                    const snap = await getDoc(docRef);
+
+                    if (snap.exists()) {
+                        setOrderDetails(snap.data());
+                    }
+
                     const res = await fetch(`/api/checkTransaction?orderId=${orderId}`);
                     const paymentData = await res.json();
 
@@ -53,7 +60,6 @@ export const ConfirmationPage = () => {
                         newStatus = "Order Canceled";
                     }
 
-                    // 3. If status has changed, update Firestore
                     if (status !== newStatus) {
                         await updateDoc(docRef, { status: newStatus });
                         setStatus(newStatus);
