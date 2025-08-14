@@ -121,8 +121,8 @@ export const CheckoutPage = () => {
                         createdAt: serverTimestamp(),
                     };
 
+                    sessionStorage.setItem("isSubmit", 1);
                     await setDoc(doc(db, "transaction_id", transaction_id), orderData);
-                    sessionStorage.setItem("isSubmit", true);
 
                     navigate(`/confirm?orderId=${transaction_id}&tableId=${tableId}`, {
                         replace: true,
@@ -142,8 +142,8 @@ export const CheckoutPage = () => {
                         createdAt: serverTimestamp(),
                     };
 
+                    sessionStorage.setItem("isSubmit", 1);
                     await setDoc(doc(db, "transaction_id", transaction_id), orderData);
-                    sessionStorage.setItem("isSubmit", true);
 
                     navigate(`/confirm?orderId=${transaction_id}&tableId=${tableId}`, {
                         replace: true,
@@ -167,8 +167,8 @@ export const CheckoutPage = () => {
                         createdAt: serverTimestamp(),
                     };
 
+                    sessionStorage.setItem("isSubmit", 1);
                     await setDoc(doc(db, "transaction_id", transaction_id), orderData);
-                    sessionStorage.setItem("isSubmit", true);
 
                     const paymentUrl = sessionStorage.getItem(`payment_${transaction_id}`);
                     if (paymentUrl && window.confirm("Payment Closed Unexpectedly. Want to continue payment?")) {
