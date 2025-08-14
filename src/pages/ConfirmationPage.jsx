@@ -19,7 +19,7 @@ export const ConfirmationPage = () => {
     const [orderDetails, setOrderDetails] = useState(null);
 
     const [searchParams] = useSearchParams();
-    const orderId = searchParams.get("orderId");
+    const orderId = searchParams.get("order_id");
     const tableId = searchParams.get("tableId");
 
     const [isSaving, setIsSaving] = useState(true);
@@ -150,7 +150,7 @@ export const ConfirmationPage = () => {
                                 <span>{item.name}</span>
                             </div>
                             <div className="text-right font-semibold">
-                                {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.price)}
+                                {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.total)}
                             </div>
                         </div>
                     ))}
