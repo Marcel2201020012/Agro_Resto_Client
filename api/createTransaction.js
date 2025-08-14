@@ -28,7 +28,7 @@ export default async function handler(req, res) {
         first_name: name,
       },
       item_details: item_details,
-      callback: {
+      callbacks: {
         finish: `https://agro-resto-client.vercel.app/confirm?tableId=${tableId}`,
         unfinish: `https://agro-resto-client.vercel.app/confirm?tableId=${tableId}`,
         error: `https://agro-resto-client.vercel.app/confirm?tableId=${tableId}`,
