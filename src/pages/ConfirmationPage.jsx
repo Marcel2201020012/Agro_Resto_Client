@@ -19,7 +19,7 @@ export const ConfirmationPage = () => {
     const [orderDetails, setOrderDetails] = useState(null);
 
     const [searchParams] = useSearchParams();
-    const orderId = searchParams.get("order_id");
+    const orderId = searchParams.get("order_id" || "orderId");
     const tableId = searchParams.get("tableId");
     const transaction_status = searchParams.get("transaction_status");
 
