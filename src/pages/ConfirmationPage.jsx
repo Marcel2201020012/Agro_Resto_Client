@@ -1,7 +1,7 @@
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { db } from "../../firebase/firebaseConfig";
-import { doc, getDoc, updateDoc} from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 function removeSessionStorage() {
     sessionStorage.removeItem("fullName");
@@ -19,7 +19,10 @@ export const ConfirmationPage = () => {
     const [orderDetails, setOrderDetails] = useState(null);
 
     const [searchParams] = useSearchParams();
-    const orderId = searchParams.get("order_id" || "orderId");
+    let orderId = searchParams.get("order_id");
+    if (!orderId) {
+        orderId = searchParams.get("orderId");
+    }
     const tableId = searchParams.get("tableId");
     const transaction_status = searchParams.get("transaction_status");
 
