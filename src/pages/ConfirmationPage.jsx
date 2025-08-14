@@ -54,7 +54,7 @@ export const ConfirmationPage = () => {
                     console.error(err);
                     setStatus("Error fetching order");
                 } finally {
-                    setLoading(false);
+                    setIsSaving(false);
                 }
             })();
         }
