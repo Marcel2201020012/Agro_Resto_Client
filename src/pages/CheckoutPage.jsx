@@ -93,6 +93,7 @@ export const CheckoutPage = () => {
                     amount: total,
                     name: fullName,
                     items: foodItems,
+                    tableId: tableId,
                 }),
             });
 

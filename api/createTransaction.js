@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { order, amount, name, items } = req.body;
+  const { order, amount, name, items, tableId } = req.body;
   const item_details = items.map(item => ({
     price: item.price,
     quantity: item.jumlah,
