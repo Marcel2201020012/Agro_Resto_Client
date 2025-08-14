@@ -101,8 +101,10 @@ export const CheckoutPage = () => {
 
             if (!data.token) {
                 setIsProcessing(false);
-                throw new Error("Gagal mendapatkan token Midtrans");
+                throw new Error("Failed to get Midtrans token");
             }
+
+            sessionStorage.setItem(`payment_${transaction_id}`, data.redirect_url);
 
             window.snap.pay(data.token, {
                 onSuccess: (result) => {
@@ -137,10 +139,16 @@ export const CheckoutPage = () => {
                 },
                 onError: (result) => {
                     console.error("Payment Error:", result);
-                    alert("Payment gagal, silakan coba lagi.");
+                    alert("Payment failed, please try again.");
                 },
                 onClose: () => {
-                    console.log("Payment popup ditutup tanpa membayar");
+                    console.log("Payment popup closed");
+                    const paymentUrl = sessionStorage.getItem(`payment_${transaction_id}`);
+                    if (paymentUrl){
+                        if(window.confirm("Payment Closed Unexpectedly. Wanted to continue payment?")){
+                            window.location.href = paymentUrl;
+                        }
+                    }
                 }
             });
 
