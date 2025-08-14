@@ -117,7 +117,7 @@ export const CheckoutPage = () => {
                         status: "Preparing Food"
                     };
 
-                    navigate(`/confirm?tableId=${tableId}`, {
+                    navigate(`/confirm?orderId=${transaction_id}&tableId=${tableId}`, {
                         replace: true,
                         state: newPendingData
                     });
@@ -132,7 +132,7 @@ export const CheckoutPage = () => {
                         status: "Waiting For Payment On Cashier"
                     };
 
-                    navigate(`/confirm?tableId=${tableId}`, {
+                    navigate(`/confirm?orderId=${transaction_id}&tableId=${tableId}`, {
                         replace: true,
                         state: newPendingData
                     });
