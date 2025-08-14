@@ -30,10 +30,11 @@ export const ConfirmationPage = () => {
     const fullName = location.state?.fullName || "";
     // const payment = location.state?.payment || "";
     const transaction_id = location.state?.transaction_id || "";
-    const status = location.state?.status || "";
+    const [status, setStatus] = useState("");
 
     const [searchParams] = useSearchParams();
     const tableId = searchParams.get("tableId");
+    const orderId = searchParams.get("orderId");
 
     const hasSaved = useRef(false);
     const [isSaving, setIsSaving] = useState(true);
@@ -46,6 +47,17 @@ export const ConfirmationPage = () => {
     }
 
     useEffect(() => {
+        if (!orderId) return;
+        fetch(`/api/checkTransaction?orderId=${orderId}`).then(res => res.json()).then(data => {
+            if (data.transaction_id === 'settlement'){
+                setStatus("Preparing Food");
+            } else if (data.transaction_id === 'pending'){
+                setStatus("Waiting For Payment On Cashier");
+            } else {
+                setStatus("Order Canceled");
+            }
+        })
+
         const jumlahMenu = sessionStorage.getItem("jumlah_menu");
 
         if (jumlahMenu === null) {
@@ -115,7 +127,7 @@ export const ConfirmationPage = () => {
             saveOrder()
         }
 
-    }, [navigate, fullName, selectedMenu, total, tableId, status]);
+    }, [navigate, fullName, selectedMenu, total, tableId, status, orderId]);
 
     if (isSaving && isSubmit !== "1") {
         return (
