@@ -33,12 +33,10 @@ export const ConfirmationPage = () => {
         const stateData = location.state;
 
         if (stateData) {
-            // Case 1: User came directly from checkout.jsx
             setStatus(stateData.status);
             setOrderDetails(stateData);
             setIsSaving(false);
         } else {
-            // Case 2: Reload or direct link → fetch from DB
             (async () => {
                 try {
                     const docRef = doc(db, "transaction_id", orderId);
@@ -143,7 +141,7 @@ export const ConfirmationPage = () => {
 
             <div className="border p-4 rounded-xl bg-gray-50">
                 <div className="space-y-2">
-                    {orderDetails.selectedMenu.map((item) => (
+                    {orderDetails?.selectedMenu?.map((item) => (
                         <div key={item.id} className="flex justify-between items-center">
                             <div className="text-left">
                                 <span>{item.jumlah}x</span>{' '}
