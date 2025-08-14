@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { order, amount, name, items, tableId } = req.body;
+  const { order, amount, name, items} = req.body;
   const item_details = items.map(item => ({
     price: item.price,
     quantity: item.jumlah,
@@ -28,11 +28,6 @@ export default async function handler(req, res) {
         first_name: name,
       },
       item_details: item_details,
-      callbacks: {
-        finish: `https://agro-resto-client.vercel.app/confirm?orderId=${order}&tableId=${tableId}`,
-        unfinish: `https://agro-resto-client.vercel.app/confirm?orderId=${order}&tableId=${tableId}`,
-        error: `https://agro-resto-client.vercel.app/confirm?orderId=${order}&tableId=${tableId}`,
-      }
     };
 
     const transaction = await snap.createTransaction(parameter);
