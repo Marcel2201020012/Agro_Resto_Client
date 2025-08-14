@@ -27,7 +27,12 @@ export default async function handler(req, res) {
       customer_details: {
         first_name: name,
       },
-      item_details: item_details
+      item_details: item_details,
+      callback: {
+        finish: `https://agro-resto-client.vercel.app/confirm?tableId=${tableId}`,
+        unfinish: `https://agro-resto-client.vercel.app/confirm?tableId=${tableId}`,
+        error: `https://agro-resto-client.vercel.app/confirm?tableId=${tableId}`,
+      }
     };
 
     const transaction = await snap.createTransaction(parameter);
