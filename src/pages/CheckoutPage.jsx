@@ -154,8 +154,19 @@ export const CheckoutPage = () => {
                     alert("Payment failed, please try again.");
                 },
 
-                onClose: () => {
+                onClose: async () => {
                     console.log("Payment popup closed");
+                    const orderData = {
+                        customerName: fullName,
+                        orderDetails: selectedMenu,
+                        total,
+                        tableId,
+                        status: "Waiting For Payment On Cashier",
+                        createdAt: serverTimestamp(),
+                    };
+
+                    await setDoc(doc(db, "transaction_id", transaction_id), orderData);
+
                     const paymentUrl = sessionStorage.getItem(`payment_${transaction_id}`);
                     if (paymentUrl && window.confirm("Payment Closed Unexpectedly. Want to continue payment?")) {
                         window.location.href = paymentUrl;
