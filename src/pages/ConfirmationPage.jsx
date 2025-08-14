@@ -1,7 +1,7 @@
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { db } from "../../firebase/firebaseConfig";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
 function removeSessionStorage() {
     sessionStorage.removeItem("fullName");
@@ -10,33 +10,16 @@ function removeSessionStorage() {
     sessionStorage.removeItem("isSubmit");
 }
 
-function formatOrder(menu) {
-    if (!Array.isArray(menu) || menu.length === 0) return "No items ordered.";
-
-    return menu
-        .map(item => {
-            const name = item.name || item.item || "Unnamed item";
-            const qty = item.jumlah || item.quantity || 1;
-            return `${name} x${qty}`;
-        })
-        .join("\n");
-}
-
 export const ConfirmationPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const selectedMenu = location.state?.selectedMenu || [];
     const total = location.state?.total || 0;
-    const fullName = location.state?.fullName || "";
     // const payment = location.state?.payment || "";
-    const transaction_id = location.state?.transaction_id || "";
     const [status, setStatus] = useState("");
+    const [orderDetails, setOrderDetails] = useState(null);
 
-    const [searchParams] = useSearchParams();
-    const tableId = searchParams.get("tableId");
-    const orderId = searchParams.get("orderId");
+    const { orderId, tableId } = useParams();
 
-    const hasSaved = useRef(false);
     const [isSaving, setIsSaving] = useState(true);
 
     const isSubmit = sessionStorage.getItem("isSubmit")
@@ -47,7 +30,34 @@ export const ConfirmationPage = () => {
     }
 
     useEffect(() => {
-        if (!orderId) return;
+        const stateData = location.state;
+
+        if (stateData) {
+            // Case 1: User came directly from checkout.jsx
+            setStatus(stateData.status);
+            setOrderDetails(stateData);
+            setIsSaving(false);
+        } else {
+            // Case 2: Reload or direct link → fetch from DB
+            (async () => {
+                try {
+                    const docRef = doc(db, "transaction_id", orderId);
+                    const snap = await getDoc(docRef);
+
+                    if (snap.exists()) {
+                        setOrderDetails(snap.data());
+                        setStatus(snap.data().status);
+                    } else {
+                        setStatus("Order Not Found");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    setStatus("Error fetching order");
+                } finally {
+                    setLoading(false);
+                }
+            })();
+        }
 
         const jumlahMenu = sessionStorage.getItem("jumlah_menu");
         if (jumlahMenu === null) {
@@ -66,69 +76,26 @@ export const ConfirmationPage = () => {
             return;
         }
 
-        fetch(`/api/checkTransaction?orderId=${orderId}`)
-            .then(res => res.json())
-            .then(async data => {
-                let newStatus;
-                if (data.transaction_status === 'settlement') {
-                    newStatus = "Preparing Food";
-                } else if (data.transaction_status === 'pending') {
-                    newStatus = "Waiting For Payment On Cashier";
-                } else {
-                    newStatus = "Order Canceled";
-                }
-
-                setStatus(newStatus);
-
-                if (!hasSaved.current && isSubmit !== "1") {
-                    hasSaved.current = true;
-                    const txId = transaction_id;
-
-                    const orderData = {
-                        customerName: fullName,
-                        status: newStatus,
-                        orderDetails: selectedMenu,
-                        total: total,
-                        tableId: tableId,
-                        createdAt: serverTimestamp(),
-                    };
-
-                    try {
-                        await setDoc(doc(db, "transaction_id", txId), orderData);
-                        sessionStorage.setItem("isSubmit", "1");
-                        console.log("Order saved:", txId);
-
-                        // Send email via Formspree
-                //         await fetch("https://formspree.io/f/movlppyb", {
-                //             method: "POST",
-                //             headers: {
-                //                 "Content-Type": "application/json",
-                //                 Accept: "application/json",
-                //             },
-                //             body: JSON.stringify({
-                //                 _subject: `New Order - Order ID: ${txId}`,
-                //                 "Customer Name": fullName,
-                //                 "Order Time": orderTime,
-                //                 "Order ID": txId,
-                //                 "Table Number": tableId,
-                //                 "Order Details": formatOrder(selectedMenu),
-                //                 "Total": `Rp${total.toString()}`,
-                //                 "Notes": `This is an automated notification from Agro Resto.
-                // If you have any questions, please contact IT support.`
-                //             }),
-                //         });
-                    } catch (error) {
-                        console.error("Error saving order:", error);
-                    } finally {
-                        setIsSaving(false);
-                    }
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                setStatus("Error checking payment");
-            });
-    }, [navigate, fullName, selectedMenu, total, tableId, orderId]);
+        // Send email via Formspree
+        //         await fetch("https://formspree.io/f/movlppyb", {
+        //             method: "POST",
+        //             headers: {
+        //                 "Content-Type": "application/json",
+        //                 Accept: "application/json",
+        //             },
+        //             body: JSON.stringify({
+        //                 _subject: `New Order - Order ID: ${txId}`,
+        //                 "Customer Name": fullName,
+        //                 "Order Time": orderTime,
+        //                 "Order ID": txId,
+        //                 "Table Number": tableId,
+        //                 "Order Details": formatOrder(selectedMenu),
+        //                 "Total": `Rp${total.toString()}`,
+        //                 "Notes": `This is an automated notification from Agro Resto.
+        // If you have any questions, please contact IT support.`
+        //             }),
+        //         });
+    }, [navigate, orderId, location.state]);
 
     if (isSaving && isSubmit !== "1") {
         return (
@@ -148,12 +115,12 @@ export const ConfirmationPage = () => {
 
                     <div>
                         <div className="font-bold">Transcation ID</div>
-                        <div>{transaction_id}</div>
+                        <div>{orderId}</div>
                     </div>
 
                     <div>
                         <div className="font-bold">Customer Name</div>
-                        <div>{fullName}</div>
+                        <div>{orderDetails.customerName}</div>
                     </div>
 
                     <div>
@@ -176,7 +143,7 @@ export const ConfirmationPage = () => {
 
             <div className="border p-4 rounded-xl bg-gray-50">
                 <div className="space-y-2">
-                    {selectedMenu.map((item) => (
+                    {orderDetails.selectedMenu.map((item) => (
                         <div key={item.id} className="flex justify-between items-center">
                             <div className="text-left">
                                 <span>{item.jumlah}x</span>{' '}

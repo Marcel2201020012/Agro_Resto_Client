@@ -1,6 +1,8 @@
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import CheckoutCard from '../components/CheckoutCard';
+import { db } from "../../firebase/firebaseConfig";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 function generateTransactionId(tableId = "XX") {
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -107,47 +109,56 @@ export const CheckoutPage = () => {
             sessionStorage.setItem(`payment_${transaction_id}`, data.redirect_url);
 
             window.snap.pay(data.token, {
-                onSuccess: (result) => {
+                onSuccess: async (result) => {
                     console.log("Payment Success:", result);
-                    const newPendingData = {
-                        fullName,
-                        selectedMenu,
+
+                    const orderData = {
+                        customerName: fullName,
+                        orderDetails: selectedMenu,
                         total,
-                        transaction_id,
-                        status: "Preparing Food"
+                        tableId,
+                        status: "Preparing Food",
+                        createdAt: serverTimestamp(),
                     };
+
+                    await setDoc(doc(db, "transaction_id", transaction_id), orderData);
 
                     navigate(`/confirm?orderId=${transaction_id}&tableId=${tableId}`, {
                         replace: true,
-                        state: newPendingData
+                        state: orderData
                     });
                 },
-                onPending: (result) => {
+
+                onPending: async (result) => {
                     console.log("Payment Pending:", result);
-                    const newPendingData = {
-                        fullName,
-                        selectedMenu,
+
+                    const orderData = {
+                        customerName: fullName,
+                        orderDetails: selectedMenu,
                         total,
-                        transaction_id,
-                        status: "Waiting For Payment On Cashier"
+                        tableId,
+                        status: "Waiting For Payment On Cashier",
+                        createdAt: serverTimestamp(),
                     };
+
+                    await setDoc(doc(db, "transaction_id", transaction_id), orderData);
 
                     navigate(`/confirm?orderId=${transaction_id}&tableId=${tableId}`, {
                         replace: true,
-                        state: newPendingData
+                        state: orderData
                     });
                 },
+
                 onError: (result) => {
                     console.error("Payment Error:", result);
                     alert("Payment failed, please try again.");
                 },
+
                 onClose: () => {
                     console.log("Payment popup closed");
                     const paymentUrl = sessionStorage.getItem(`payment_${transaction_id}`);
-                    if (paymentUrl){
-                        if(window.confirm("Payment Closed Unexpectedly. Wanted to continue payment?")){
-                            window.location.href = paymentUrl;
-                        }
+                    if (paymentUrl && window.confirm("Payment Closed Unexpectedly. Want to continue payment?")) {
+                        window.location.href = paymentUrl;
                     }
                 }
             });
