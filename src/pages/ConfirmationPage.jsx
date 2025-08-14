@@ -1,7 +1,7 @@
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useState} from "react";
 import { db } from "../../firebase/firebaseConfig";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc} from "firebase/firestore";
 
 function removeSessionStorage() {
     sessionStorage.removeItem("fullName");
@@ -18,7 +18,9 @@ export const ConfirmationPage = () => {
     const [status, setStatus] = useState("");
     const [orderDetails, setOrderDetails] = useState(null);
 
-    const { orderId, tableId } = useParams();
+    const [searchParams] = useSearchParams();
+    const orderId = searchParams.get("orderId");
+    const tableId = searchParams.get("tableId");
 
     const [isSaving, setIsSaving] = useState(true);
 
@@ -141,7 +143,7 @@ export const ConfirmationPage = () => {
 
             <div className="border p-4 rounded-xl bg-gray-50">
                 <div className="space-y-2">
-                    {orderDetails?.selectedMenu?.map((item) => (
+                    {orderDetails?.orderDetails?.map((item) => (
                         <div key={item.id} className="flex justify-between items-center">
                             <div className="text-left">
                                 <span>{item.jumlah}x</span>{' '}
