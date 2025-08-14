@@ -119,6 +119,12 @@ export const ConfirmationPage = () => {
                 <p className="text-lg font-semibold">Saving your order...</p>
             </div>
         )
+    } else if (isSaving){
+          return (
+            <div className="container min-h-screen flex justify-center items-center">
+                <p className="text-lg font-semibold">Saving your order...</p>
+            </div>
+        )
     }
 
     return (
