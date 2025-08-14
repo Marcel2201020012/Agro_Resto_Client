@@ -21,6 +21,7 @@ export const ConfirmationPage = () => {
     const [searchParams] = useSearchParams();
     const orderId = searchParams.get("order_id");
     const tableId = searchParams.get("tableId");
+    const transaction_status = searchParams.get("transaction_status");
 
     const [isSaving, setIsSaving] = useState(true);
 
@@ -48,13 +49,10 @@ export const ConfirmationPage = () => {
                         setOrderDetails(snap.data());
                     }
 
-                    const res = await fetch(`/api/checkTransaction?orderId=${orderId}`);
-                    const paymentData = await res.json();
-
                     let newStatus;
-                    if (paymentData.transaction_status === "settlement") {
+                    if (transaction_status === "settlement") {
                         newStatus = "Preparing Food";
-                    } else if (paymentData.transaction_status === "pending") {
+                    } else if (transaction_status === "pending") {
                         newStatus = "Waiting For Payment On Cashier";
                     } else {
                         newStatus = "Order Canceled";
@@ -66,7 +64,7 @@ export const ConfirmationPage = () => {
                     }
                 } catch (err) {
                     console.error(err);
-                    setStatus("Error fetching order");
+                    setStatus("Waiting For Payment On Cashier");
                 } finally {
                     setIsSaving(false);
                 }
