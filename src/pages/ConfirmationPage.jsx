@@ -48,89 +48,88 @@ export const ConfirmationPage = () => {
 
     useEffect(() => {
         if (!orderId) return;
-        fetch(`/api/checkTransaction?orderId=${orderId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.transaction_status === 'settlement') {
-                    setStatus("Preparing Food");
-                } else if (data.transaction_status === 'pending') {
-                    setStatus("Waiting For Payment On Cashier");
-                } else {
-                    setStatus("Order Canceled");
-                }
-            })
-            .catch(err => setStatus("Error checking payment"));
 
         const jumlahMenu = sessionStorage.getItem("jumlah_menu");
-
         if (jumlahMenu === null) {
             removeSessionStorage();
-            navigate(`/menu?tableId=${tableId}`, { replace: true });
+            navigate(`/menu?tableId=${tableId}, { replace: true }`);
             return;
         }
 
         const jumlah = JSON.parse(jumlahMenu);
-
         if (
             (Array.isArray(jumlah) && jumlah.length === 0) ||
             (typeof jumlah === "object" && !Array.isArray(jumlah) && Object.keys(jumlah).length === 0)
         ) {
             removeSessionStorage();
-            navigate(`/menu?tableId=${tableId}`, { replace: true });
+            navigate(`/menu?tableId=${tableId}, { replace: true }`);
             return;
         }
 
-        const saveOrder = async () => {
-            if (hasSaved.current) return;
-            hasSaved.current = true;
-            const txId = transaction_id;
+        fetch(`/api/checkTransaction?orderId=${orderId}`)
+            .then(res => res.json())
+            .then(async data => {
+                let newStatus;
+                if (data.transaction_status === 'settlement') {
+                    newStatus = "Preparing Food";
+                } else if (data.transaction_status === 'pending') {
+                    newStatus = "Waiting For Payment On Cashier";
+                } else {
+                    newStatus = "Order Canceled";
+                }
 
-            const orderData = {
-                customerName: fullName,
-                status: status,
-                orderDetails: selectedMenu,
-                total: total,
-                tableId: tableId,
-                createdAt: serverTimestamp(),
-                // payment: payment
-            };
+                setStatus(newStatus);
 
-            try {
-                await setDoc(doc(db, "transaction_id", txId), orderData);
-                sessionStorage.setItem("isSubmit", "1");
-                console.log("Order saved:", txId);
+                // Save order AFTER knowing the status
+                if (!hasSaved.current && isSubmit !== "1") {
+                    hasSaved.current = true;
+                    const txId = transaction_id;
 
-                // Send email via Formspree
-                //                 await fetch("https://formspree.io/f/movlppyb", {
-                //                     method: "POST",
-                //                     headers: {
-                //                         "Content-Type": "application/json",
-                //                         Accept: "application/json",
-                //                     },
-                //                     body: JSON.stringify({
-                //                         _subject: `New Order - Order ID: ${txId}`,
-                //                         "Customer Name": fullName,
-                //                         "Order Time": orderTime,
-                //                         "Order ID": txId,
-                //                         "Table Number": tableId,
-                //                         "Order Details": formatOrder(selectedMenu),
-                //                         "Total": `Rp${total.toString()}`,
-                //                         "Notes": `This is an automated notification from Agro Resto.
+                    const orderData = {
+                        customerName: fullName,
+                        status: newStatus, // ← correct status
+                        orderDetails: selectedMenu,
+                        total: total,
+                        tableId: tableId,
+                        createdAt: serverTimestamp(),
+                    };
+
+                    try {
+                        await setDoc(doc(db, "transaction_id", txId), orderData);
+                        sessionStorage.setItem("isSubmit", "1");
+                        console.log("Order saved:", txId);
+
+                        // Send email via Formspree
+                //         await fetch("https://formspree.io/f/movlppyb", {
+                //             method: "POST",
+                //             headers: {
+                //                 "Content-Type": "application/json",
+                //                 Accept: "application/json",
+                //             },
+                //             body: JSON.stringify({
+                //                 _subject: `New Order - Order ID: ${txId}`,
+                //                 "Customer Name": fullName,
+                //                 "Order Time": orderTime,
+                //                 "Order ID": txId,
+                //                 "Table Number": tableId,
+                //                 "Order Details": formatOrder(selectedMenu),
+                //                 "Total": `Rp${total.toString()}`,
+                //                 "Notes": `This is an automated notification from Agro Resto.
                 // If you have any questions, please contact IT support.`
-                //                     }),
-                //                 });
-            } catch (error) {
-                console.error("Error saving order:", error);
-            } finally {
-                setIsSaving(false);
-            }
-        };
-
-        if (isSubmit !== "1") {
-            saveOrder()
-        }
-
-    }, [navigate, fullName, selectedMenu, total, tableId, status, orderId]);
+                //             }),
+                //         });
+                    } catch (error) {
+                        console.error("Error saving order:", error);
+                    } finally {
+                        setIsSaving(false);
+                    }
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                setStatus("Error checking payment");
+            });
+    }, [navigate, fullName, selectedMenu, total, tableId, orderId]);
 
     if (isSaving && isSubmit !== "1") {
         return (
