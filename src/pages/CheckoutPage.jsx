@@ -189,6 +189,14 @@ export const CheckoutPage = () => {
         setShowModal(false);
     };
 
+    if (isProcessing) {
+        return (
+            <div className="container min-h-screen flex justify-center items-center">
+                <p className="text-lg font-semibold">Saving your order...</p>
+            </div>
+        )
+    }
+
     return (
         <div className="container min-h-screen overflow-x-hidden pt-8 pb-16">
             <h1 className="text-left text-sm text-agro-color font-semibold mb-1">CHECKOUT</h1>
