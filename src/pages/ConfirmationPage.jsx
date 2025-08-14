@@ -39,6 +39,7 @@ export const ConfirmationPage = () => {
             setStatus(stateData.status);
             setOrderDetails(stateData);
             setIsSaving(false);
+            console.log("state data existed")
         } else {
             (async () => {
                 try {
