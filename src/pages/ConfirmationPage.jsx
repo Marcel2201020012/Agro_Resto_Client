@@ -150,7 +150,7 @@ export const ConfirmationPage = () => {
                                 <span>{item.name}</span>
                             </div>
                             <div className="text-right font-semibold">
-                                Rp{item.price}
+                                {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.price)}
                             </div>
                         </div>
                     ))}
@@ -158,7 +158,7 @@ export const ConfirmationPage = () => {
 
                 <div className="flex justify-between mt-4 border-t pt-2">
                     <p className="font-semibold">Total</p>
-                    <p className="text-green-700 font-semibold">Rp{total}</p>
+                    <p className="text-green-700 font-semibold">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total)}</p>
                 </div>
             </div>
 
