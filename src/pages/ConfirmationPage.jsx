@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { db } from "../../firebase/firebaseConfig";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 
-function removeSessionStorage() {
+function removeSessionStorage(txid) {
     sessionStorage.removeItem("fullName");
     sessionStorage.removeItem("payment");
     sessionStorage.removeItem("jumlah_menu");
     sessionStorage.removeItem("isSubmit");
+    sessionStorage.removeItem(`payment_${txid}`);
 }
 
 export const ConfirmationPage = () => {
@@ -31,7 +32,7 @@ export const ConfirmationPage = () => {
     const isSubmit = sessionStorage.getItem("isSubmit")
 
     const handleConfirm = () => {
-        removeSessionStorage();
+        removeSessionStorage(orderId);
         navigate(`/menu?tableId=${tableId}`, { replace: true });
     }
 
