@@ -48,7 +48,7 @@ export const ConfirmationPage = () => {
 
     useEffect(() => {
         if (!orderId) return;
-        fetch(`/api/checkTransaction?orderId=${orderId}`).then(res => res.json()).then(data => {
+        fetch(`/api/createTransaction?orderId=${orderId}`).then(res => res.json()).then(data => {
             if (data.transaction_id === 'settlement'){
                 setStatus("Preparing Food");
             } else if (data.transaction_id === 'pending'){
