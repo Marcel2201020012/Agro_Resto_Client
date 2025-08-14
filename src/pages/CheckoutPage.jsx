@@ -27,6 +27,8 @@ export const CheckoutPage = () => {
     const [fullName, setFullName] = useState('');
     const [fullNameError, setFullNameError] = useState("");
 
+    const [isSaving, setIsSaving] = useState(false);
+
     // const [payment, setPayment] = useState("");
     // const [paymentError, setPaymentError] = useState("");
 
@@ -122,6 +124,7 @@ export const CheckoutPage = () => {
                     };
 
                     sessionStorage.setItem("isSubmit", 1);
+                    setIsSaving(true);
                     await setDoc(doc(db, "transaction_id", transaction_id), orderData);
 
                     navigate(`/confirm?orderId=${transaction_id}&tableId=${tableId}`, {
@@ -143,6 +146,7 @@ export const CheckoutPage = () => {
                     };
 
                     sessionStorage.setItem("isSubmit", 1);
+                    setIsSaving(true);
                     await setDoc(doc(db, "transaction_id", transaction_id), orderData);
 
                     navigate(`/confirm?orderId=${transaction_id}&tableId=${tableId}`, {
@@ -168,6 +172,7 @@ export const CheckoutPage = () => {
                     };
 
                     sessionStorage.setItem("isSubmit", 1);
+                    setIsSaving(true);
                     await setDoc(doc(db, "transaction_id", transaction_id), orderData);
 
                     const paymentUrl = sessionStorage.getItem(`payment_${transaction_id}`);
@@ -189,7 +194,7 @@ export const CheckoutPage = () => {
         setShowModal(false);
     };
 
-    if (isProcessing) {
+    if (isSaving) {
         return (
             <div className="container min-h-screen flex justify-center items-center">
                 <p className="text-lg font-semibold">Saving your order...</p>
