@@ -48,15 +48,18 @@ export const ConfirmationPage = () => {
 
     useEffect(() => {
         if (!orderId) return;
-        fetch(`/api/createTransaction?orderId=${orderId}`).then(res => res.json()).then(data => {
-            if (data.transaction_id === 'settlement'){
-                setStatus("Preparing Food");
-            } else if (data.transaction_id === 'pending'){
-                setStatus("Waiting For Payment On Cashier");
-            } else {
-                setStatus("Order Canceled");
-            }
-        })
+        fetch(`/api/checkTransaction?orderId=${orderId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.transaction_status === 'settlement') {
+                    setStatus("Preparing Food");
+                } else if (data.transaction_status === 'pending') {
+                    setStatus("Waiting For Payment On Cashier");
+                } else {
+                    setStatus("Order Canceled");
+                }
+            })
+            .catch(err => setStatus("Error checking payment"));
 
         const jumlahMenu = sessionStorage.getItem("jumlah_menu");
 
@@ -98,24 +101,24 @@ export const ConfirmationPage = () => {
                 console.log("Order saved:", txId);
 
                 // Send email via Formspree
-//                 await fetch("https://formspree.io/f/movlppyb", {
-//                     method: "POST",
-//                     headers: {
-//                         "Content-Type": "application/json",
-//                         Accept: "application/json",
-//                     },
-//                     body: JSON.stringify({
-//                         _subject: `New Order - Order ID: ${txId}`,
-//                         "Customer Name": fullName,
-//                         "Order Time": orderTime,
-//                         "Order ID": txId,
-//                         "Table Number": tableId,
-//                         "Order Details": formatOrder(selectedMenu),
-//                         "Total": `Rp${total.toString()}`,
-//                         "Notes": `This is an automated notification from Agro Resto.
-// If you have any questions, please contact IT support.`
-//                     }),
-//                 });
+                //                 await fetch("https://formspree.io/f/movlppyb", {
+                //                     method: "POST",
+                //                     headers: {
+                //                         "Content-Type": "application/json",
+                //                         Accept: "application/json",
+                //                     },
+                //                     body: JSON.stringify({
+                //                         _subject: `New Order - Order ID: ${txId}`,
+                //                         "Customer Name": fullName,
+                //                         "Order Time": orderTime,
+                //                         "Order ID": txId,
+                //                         "Table Number": tableId,
+                //                         "Order Details": formatOrder(selectedMenu),
+                //                         "Total": `Rp${total.toString()}`,
+                //                         "Notes": `This is an automated notification from Agro Resto.
+                // If you have any questions, please contact IT support.`
+                //                     }),
+                //                 });
             } catch (error) {
                 console.error("Error saving order:", error);
             } finally {
