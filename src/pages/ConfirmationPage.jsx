@@ -40,7 +40,7 @@ export const ConfirmationPage = () => {
         const batchUpdates = orderDetails?.orderDetails?.map(async (item) => {
             const menuRef = doc(db, "menu_makanan", item.id);
             await updateDoc(menuRef, {
-                stocks: increment(-orderedItem.jumlah)
+                stocks: increment(-item.jumlah)
             });
         });
 
