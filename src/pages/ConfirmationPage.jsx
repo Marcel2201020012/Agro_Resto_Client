@@ -36,17 +36,12 @@ export const ConfirmationPage = () => {
         navigate(`/menu?tableId=${tableId}`, { replace: true });
     }
 
-    const updateStock = async () => {
-        if (!orderDetails?.orderDetails){
-            console.log("orderDetailas is emtpy");
-            return;
-        }
+    const updateStock = async (details) => {
+        if (!details?.orderDetails) return;
 
-        const batchUpdates = orderDetails.orderDetails.map((item) => {
+        const batchUpdates = details.orderDetails.map(item => {
             const menuRef = doc(db, "menu_makanan", item.id);
-            return updateDoc(menuRef, {
-                stocks: increment(-item.jumlah)
-            });
+            return updateDoc(menuRef, { stocks: increment(-item.jumlah) });
         });
 
         await Promise.all(batchUpdates);
@@ -58,12 +53,12 @@ export const ConfirmationPage = () => {
             const docRef = doc(db, "transaction_id", orderId);
 
             if (stateData) {
-                setStatus(stateData.status);
                 setOrderDetails(stateData);
                 await updateDoc(docRef, { paymentUrl: paymentUrl });
-                updateStock();
+                await updateStock(stateData);
                 setIsSaving(false);
-            } else {
+            }
+            else {
                 try {
                     const snap = await getDoc(docRef);
 
