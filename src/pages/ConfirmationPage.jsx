@@ -1,7 +1,7 @@
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase/firebaseConfig";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
 
 function removeSessionStorage(txid) {
     sessionStorage.removeItem("fullName");
@@ -14,7 +14,6 @@ function removeSessionStorage(txid) {
 export const ConfirmationPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const total = location.state?.total || 0;
     // const payment = location.state?.payment || "";
     const [status, setStatus] = useState("");
     const [orderDetails, setOrderDetails] = useState(null);
@@ -37,6 +36,17 @@ export const ConfirmationPage = () => {
         navigate(`/menu?tableId=${tableId}`, { replace: true });
     }
 
+    const updateStock = async () => {
+        const batchUpdates = orderDetails?.orderDetails?.map(async (item) => {
+            const menuRef = doc(db, "menu_makanan", item.id);
+            await updateDoc(menuRef, {
+                stocks: increment(-orderedItem.jumlah)
+            });
+        });
+
+        await Promise.all(batchUpdates);
+    };
+
     useEffect(() => {
         const run = async () => {
             const stateData = location.state;
@@ -46,6 +56,7 @@ export const ConfirmationPage = () => {
                 setStatus(stateData.status);
                 setOrderDetails(stateData);
                 await updateDoc(docRef, { paymentUrl: paymentUrl });
+                updateStock();
                 setIsSaving(false);
             } else {
                 try {
@@ -58,6 +69,7 @@ export const ConfirmationPage = () => {
                     let newStatus;
                     if (transaction_status === "settlement") {
                         newStatus = "Preparing Food";
+                        updateStock();
                     } else if (transaction_status === "pending") {
                         newStatus = "Waiting For Payment On Cashier";
                     } else {

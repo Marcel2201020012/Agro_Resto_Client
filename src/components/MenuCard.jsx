@@ -1,6 +1,6 @@
 import { Minus, Plus } from 'lucide-react';
 
-const MenuCard = ({ id, name, cn, price, image, jumlah, tambah, kurang }) => {
+const MenuCard = ({ id, name, cn, price, stocks, image, jumlah, tambah, kurang }) => {
   return (
     <div className="relative bg-white rounded-xl shadow-lg p-4">
       <div className="lg:flex">
@@ -11,13 +11,19 @@ const MenuCard = ({ id, name, cn, price, image, jumlah, tambah, kurang }) => {
         />
 
         {/* nama menu + price */}
-        <div className="mt-4 text-left">
+        <div className="text-left">
           <h3 className="text-black text-sm font-medium">{name}</h3>
           <h3 className="text-black text-sm font-medium">{cn}</h3>
-          <p className="text-red-500 text-sm font-semibold">
+          <p className="text-agro-color text-sm font-semibold">
             {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)}
           </p>
         </div>
+      </div>
+
+      <div className='text-left'>
+        <h3 className='text-sm text-red-500 font-medium'>
+          {stocks < 1 ? "Stocks: Empty" : `Stocks: ${stocks}`}
+        </h3>
       </div>
 
       <br />
@@ -35,8 +41,8 @@ const MenuCard = ({ id, name, cn, price, image, jumlah, tambah, kurang }) => {
           <span className="text-black font-semibold w-6">{jumlah}</span>
         )}
 
-        <button className={`rounded-full p-1 ${jumlah > 9 ? 'bg-gray-200 text-gray-400' : 'button-normal button-hover disable'
-          }`} onClick={() => tambah(id)} disabled={jumlah > 9}>
+        <button className={`rounded-full p-1 ${stocks < 1 || !stocks ? 'bg-gray-200 text-gray-400' : 'button-normal button-hover disable'
+          }`} onClick={() => tambah(id)} disabled={stocks < 1}>
           <Plus size={16} />
         </button>
       </div>

@@ -6,12 +6,6 @@ import { Link, useSearchParams } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 
-function removeSessionStorage() {
-  sessionStorage.removeItem("fullName");
-  sessionStorage.setItem("jumlah_menu", "");
-  sessionStorage.removeItem("isSubmit");
-}
-
 function MenuCategory({ category, title, MenuData, jumlah, tambah, kurang }) {
   const filteredItems = MenuData
     .filter(item => item.category === category)
@@ -29,6 +23,7 @@ function MenuCategory({ category, title, MenuData, jumlah, tambah, kurang }) {
             name={item.name}
             cn={item.cn}
             price={item.price}
+            stocks={item.stocks}
             image={item.image}
             jumlah={jumlah[item.id] || 0}
             tambah={tambah}
@@ -42,9 +37,9 @@ function MenuCategory({ category, title, MenuData, jumlah, tambah, kurang }) {
 
 export const Menu = () => {
   const [jumlah, setJumlah] = useState({});
+
   const [isLoaded, setIsLoaded] = useState(false);
   const isFirstLoad = useRef(true);
-
   const [MenuData, setMenu] = useState([]);
 
   const [searchParams] = useSearchParams();
@@ -54,28 +49,29 @@ export const Menu = () => {
     const fetchMenu = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "menu_makanan"));
-        const list = querySnapshot.docs.map(doc => ({
+        let list = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
+
+        list = list.map(item => ({
+          ...item,
+          stocks: item.stocks - (jumlah[item.id] || 0)
+        }));
+
         setMenu(list);
       } finally {
         setIsLoaded(true);
       }
-    }
+    };
+
     fetchMenu();
-  }, []);
+  }, [jumlah]);
 
   //Simpan menu yang sudah dipilih ke local storage agar dapat dipull kembali saat user ingin mengganti menu
   //load menu jika ada value
   useEffect(() => {
-    const isSubmit = sessionStorage.getItem("isSubmit");
     const savedMenu = sessionStorage.getItem("jumlah_menu");
-
-    if (isSubmit === "1") {
-      removeSessionStorage();
-      return;
-    }
 
     if (savedMenu) {
       setJumlah(JSON.parse(savedMenu));
@@ -92,13 +88,29 @@ export const Menu = () => {
   }, [jumlah, isLoaded]);
 
   const tambah = (id) => {
+    setMenu(prevMenu =>
+      prevMenu.map(item =>
+        item.id === id && item.stocks > 0
+          ? { ...item, stocks: item.stocks - 1 }
+          : item
+      )
+    );
     setJumlah(prev => ({
       ...prev,
       [id]: (prev[id] || 0) + 1
     }));
   };
 
+
   const kurang = (id) => {
+    setMenu(prevMenu =>
+      prevMenu.map(item =>
+        item.id === id
+          ? { ...item, stocks: item.stocks + 1 }
+          : item
+      )
+    );
+
     setJumlah(prev => {
       const temp = { ...prev };
       if (temp[id] > 1) {
