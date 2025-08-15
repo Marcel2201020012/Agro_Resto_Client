@@ -37,9 +37,14 @@ export const ConfirmationPage = () => {
     }
 
     const updateStock = async () => {
-        const batchUpdates = orderDetails?.orderDetails?.map(async (item) => {
+        if (!orderDetails?.orderDetails){
+            console.log("orderDetailas is emtpy");
+            return;
+        }
+
+        const batchUpdates = orderDetails.orderDetails.map((item) => {
             const menuRef = doc(db, "menu_makanan", item.id);
-            await updateDoc(menuRef, {
+            return updateDoc(menuRef, {
                 stocks: increment(-item.jumlah)
             });
         });
