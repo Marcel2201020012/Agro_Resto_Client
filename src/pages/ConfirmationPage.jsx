@@ -7,7 +7,7 @@ function removeSessionStorage(txid) {
     sessionStorage.removeItem("fullName");
     sessionStorage.removeItem("payment");
     sessionStorage.removeItem("jumlah_menu");
-    sessionStorage.removeItem("isSubmit");
+    // sessionStorage.removeItem("isSubmit");
     sessionStorage.removeItem(`payment_${txid}`);
 }
 
@@ -26,28 +26,29 @@ export const ConfirmationPage = () => {
     }
     const tableId = searchParams.get("tableId");
     const transaction_status = searchParams.get("transaction_status");
+    const paymentUrl = sessionStorage.getItem(`payment_${orderId}`);
 
     const [isSaving, setIsSaving] = useState(true);
 
-    const isSubmit = sessionStorage.getItem("isSubmit")
+    // const isSubmit = sessionStorage.getItem("isSubmit")
 
-    const handleConfirm = () => {
+    const handleBack = () => {
         removeSessionStorage(orderId);
         navigate(`/menu?tableId=${tableId}`, { replace: true });
     }
 
     useEffect(() => {
-        const stateData = location.state;
+        const run = async () => {
+            const stateData = location.state;
+            const docRef = doc(db, "transaction_id", orderId);
 
-        if (stateData) {
-            setStatus(stateData.status);
-            setOrderDetails(stateData);
-            setIsSaving(false);
-            console.log("state data existed")
-        } else {
-            (async () => {
+            if (stateData) {
+                setStatus(stateData.status);
+                setOrderDetails(stateData);
+                await updateDoc(docRef, { paymentUrl: paymentUrl });
+                setIsSaving(false);
+            } else {
                 try {
-                    const docRef = doc(db, "transaction_id", orderId);
                     const snap = await getDoc(docRef);
 
                     if (snap.exists()) {
@@ -73,55 +74,45 @@ export const ConfirmationPage = () => {
                 } finally {
                     setIsSaving(false);
                 }
-            })();
-        }
+            }
 
-        const jumlahMenu = sessionStorage.getItem("jumlah_menu");
-        if (jumlahMenu === null) {
-            removeSessionStorage();
-            navigate(`/menu?tableId=${tableId}, { replace: true }`);
-            return;
-        }
+            const redirectCheck =
+                sessionStorage.getItem(`payment_${orderId}`) || transaction_status;
+            if (redirectCheck === "") {
+                removeSessionStorage(orderId);
+                navigate(`/menu?tableId=${tableId}`, { replace: true });
+            }
 
-        const jumlah = JSON.parse(jumlahMenu);
-        if (
-            (Array.isArray(jumlah) && jumlah.length === 0) ||
-            (typeof jumlah === "object" && !Array.isArray(jumlah) && Object.keys(jumlah).length === 0)
-        ) {
-            removeSessionStorage();
-            navigate(`/menu?tableId=${tableId}, { replace: true }`);
-            return;
-        }
-
-        // Send email via Formspree
-        //         await fetch("https://formspree.io/f/movlppyb", {
-        //             method: "POST",
-        //             headers: {
-        //                 "Content-Type": "application/json",
-        //                 Accept: "application/json",
-        //             },
-        //             body: JSON.stringify({
-        //                 _subject: `New Order - Order ID: ${txId}`,
-        //                 "Customer Name": fullName,
-        //                 "Order Time": orderTime,
-        //                 "Order ID": txId,
-        //                 "Table Number": tableId,
-        //                 "Order Details": formatOrder(selectedMenu),
-        //                 "Total": `Rp${total.toString()}`,
-        //                 "Notes": `This is an automated notification from Agro Resto.
-        // If you have any questions, please contact IT support.`
-        //             }),
-        //         });
+            // Send email via Formspree
+            //         await fetch("https://formspree.io/f/movlppyb", {
+            //             method: "POST",
+            //             headers: {
+            //                 "Content-Type": "application/json",
+            //                 Accept: "application/json",
+            //             },
+            //             body: JSON.stringify({
+            //                 _subject: `New Order - Order ID: ${txId}`,
+            //                 "Customer Name": fullName,
+            //                 "Order Time": orderTime,
+            //                 "Order ID": txId,
+            //                 "Table Number": tableId,
+            //                 "Order Details": formatOrder(selectedMenu),
+            //                 "Total": `Rp${total.toString()}`,
+            //                 "Notes": `This is an automated notification from Agro Resto.
+            // If you have any questions, please contact IT support.`
+            //             }),
+            //         });
+        };
+        run();
     }, [navigate, orderId, location.state]);
 
-    if (isSaving && isSubmit !== "1") {
+
+    const handlePayNow = () => {
+        window.location.href = paymentUrl;
+    }
+
+    if (isSaving) {
         return (
-            <div className="container min-h-screen flex justify-center items-center">
-                <p className="text-lg font-semibold">Saving your order...</p>
-            </div>
-        )
-    } else if (isSaving){
-          return (
             <div className="container min-h-screen flex justify-center items-center">
                 <p className="text-lg font-semibold">Saving your order...</p>
             </div>
@@ -173,7 +164,7 @@ export const ConfirmationPage = () => {
                                 <span>{item.name}</span>
                             </div>
                             <div className="text-right font-semibold">
-                                Rp {item.price}
+                                {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.price)}
                             </div>
                         </div>
                     ))}
@@ -185,10 +176,16 @@ export const ConfirmationPage = () => {
                 </div>
             </div>
 
-            <div className="flex mt-10">
-                <button onClick={handleConfirm} className="bg-agro-color rounded-full text-white px-6 py-2">
+            <div className="flex justify-between mt-10">
+                <button onClick={handleBack} className="bg-agro-color rounded-full text-white px-6 py-2">
                     <span>Back</span>
                 </button>
+
+                {status === "Waiting For Payment On Cashier" &&
+                    <button onClick={handlePayNow} className="bg-agro-color rounded-full text-white px-6 py-2">
+                        <span>Pay Now</span>
+                    </button>
+                }
             </div>
 
         </div>

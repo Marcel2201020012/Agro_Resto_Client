@@ -78,6 +78,10 @@ export const CheckoutPage = () => {
     };
 
     const handleConfirm = async () => {
+        Object.keys(sessionStorage)
+            .filter(key => key.startsWith('payment_'))
+            .forEach(key => sessionStorage.removeItem(key));
+
         setShowModal(false);
         setIsProcessing(true);
 
@@ -112,6 +116,7 @@ export const CheckoutPage = () => {
 
             window.snap.pay(data.token, {
                 onSuccess: async (result) => {
+                    setIsProcessing(false);
                     console.log("Payment Success:", result);
 
                     const orderData = {
@@ -123,7 +128,7 @@ export const CheckoutPage = () => {
                         createdAt: serverTimestamp(),
                     };
 
-                    sessionStorage.setItem("isSubmit", 1);
+                    //sessionStorage.setItem("isSubmit", 1);
                     setIsSaving(true);
                     await setDoc(doc(db, "transaction_id", transaction_id), orderData);
 
@@ -134,6 +139,7 @@ export const CheckoutPage = () => {
                 },
 
                 onPending: async (result) => {
+                    setIsProcessing(false);
                     console.log("Payment Pending:", result);
 
                     const orderData = {
@@ -145,7 +151,7 @@ export const CheckoutPage = () => {
                         createdAt: serverTimestamp(),
                     };
 
-                    sessionStorage.setItem("isSubmit", 1);
+                    //sessionStorage.setItem("isSubmit", 1);
                     setIsSaving(true);
                     await setDoc(doc(db, "transaction_id", transaction_id), orderData);
 
@@ -156,11 +162,13 @@ export const CheckoutPage = () => {
                 },
 
                 onError: (result) => {
+                    setIsProcessing(false);
                     console.error("Payment Error:", result);
                     alert("Payment failed, please try again.");
                 },
 
                 onClose: async () => {
+                    setIsProcessing(false);
                     console.log("Payment popup closed");
                     const orderData = {
                         customerName: fullName,
@@ -171,9 +179,8 @@ export const CheckoutPage = () => {
                         createdAt: serverTimestamp(),
                     };
 
-                    sessionStorage.setItem("isSubmit", 1);
-                    setIsSaving(true);
-                    await setDoc(doc(db, "transaction_id", transaction_id), orderData);
+                    //sessionStorage.setItem("isSubmit", 1);
+                    //await setDoc(doc(db, "transaction_id", transaction_id), orderData);
 
                     const paymentUrl = sessionStorage.getItem(`payment_${transaction_id}`);
                     if (paymentUrl && window.confirm("Payment Closed Unexpectedly. Want to continue payment?")) {
@@ -184,9 +191,7 @@ export const CheckoutPage = () => {
 
         } catch (err) {
             console.error(err);
-            alert("Terjadi kesalahan saat memproses pembayaran");
-        } finally {
-            setIsProcessing(false);
+            alert("Payment Error");
         }
     };
 
