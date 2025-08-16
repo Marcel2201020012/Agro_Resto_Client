@@ -53,6 +53,7 @@ export const ConfirmationPage = () => {
             const docRef = doc(db, "transaction_id", orderId);
 
             if (stateData) {
+                setStatus(stateData.status);
                 setOrderDetails(stateData);
                 await updateDoc(docRef, { paymentUrl: paymentUrl });
                 await updateStock(stateData);
