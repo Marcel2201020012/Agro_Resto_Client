@@ -12,13 +12,20 @@ function removeSessionStorage(txid) {
     sessionStorage.removeItem(`payment_${txid}`);
 }
 
-function updateMenuSolds(order){
-    order.array.forEach(element => {
-        const menuRef = ref(db, `menu_solds/${element.id}`);
-        runTransaction(menuRef, (current) => {
-            return (current || 0) + element.jumlah;
-        })
+function updateMenuSolds(orderDetails) {
+  if (!orderDetails) return;
+
+  // Ensure array
+  const items = Array.isArray(orderDetails)
+    ? orderDetails
+    : Object.values(orderDetails);
+
+  items.forEach(element => {
+    const menuRef = ref(db, `menu_solds/${element.id}`);
+    runTransaction(menuRef, (current) => {
+      return (current || 0) + element.jumlah;
     });
+  });
 }
 
 export const ConfirmationPage = () => {
@@ -67,7 +74,7 @@ export const ConfirmationPage = () => {
                 setOrderDetails(stateData);
                 await updateDoc(docRef, { paymentUrl: paymentUrl });
                 await updateStock(stateData);
-                updateMenuSolds(orderDetails);
+                updateMenuSolds(stateData.orderDetails);
                 setIsSaving(false);
             }
             else {
@@ -75,23 +82,24 @@ export const ConfirmationPage = () => {
                     const snap = await getDoc(docRef);
 
                     if (snap.exists()) {
-                        setOrderDetails(snap.data());
-                    }
+                        const data = snap.data();
+                        setOrderDetails(data);
 
-                    let newStatus;
-                    if (transaction_status === "settlement") {
-                        newStatus = "Preparing Food";
-                        updateStock();
-                        updateMenuSolds(orderDetails);
-                    } else if (transaction_status === "pending") {
-                        newStatus = "Waiting For Payment On Cashier";
-                    } else {
-                        newStatus = "Order Canceled";
-                    }
+                        let newStatus;
+                        if (transaction_status === "settlement") {
+                            newStatus = "Preparing Food";
+                            updateStock(data);
+                            updateMenuSolds(data.orderDetails);
+                        } else if (transaction_status === "pending") {
+                            newStatus = "Waiting For Payment On Cashier";
+                        } else {
+                            newStatus = "Order Canceled";
+                        }
 
-                    if (status !== newStatus) {
-                        await updateDoc(docRef, { status: newStatus });
-                        setStatus(newStatus);
+                        if (status !== newStatus) {
+                            await updateDoc(docRef, { status: newStatus });
+                            setStatus(newStatus);
+                        }
                     }
                 } catch (err) {
                     console.error(err);
