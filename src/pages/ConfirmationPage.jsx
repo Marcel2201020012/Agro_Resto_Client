@@ -67,10 +67,12 @@ export const ConfirmationPage = () => {
             const docRef = doc(db, "transaction_id", orderId);
 
             if (stateData) {
+                //confirmation flow for normal success payment
                 setStatus(stateData.status);
                 setOrderDetails(stateData);
                 await updateDoc(docRef, { paymentUrl: paymentUrl });
                 await updateStock(stateData);
+                updateMenuSolds(orderDetails.orderDetails);
                 setIsSaving(false);
             }
             else {
