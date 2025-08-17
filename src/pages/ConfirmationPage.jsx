@@ -72,7 +72,7 @@ export const ConfirmationPage = () => {
                 setOrderDetails(stateData);
                 await updateDoc(docRef, { paymentUrl: paymentUrl });
                 await updateStock(stateData);
-                updateMenuSolds(orderDetails.orderDetails);
+                await updateMenuSolds(orderDetails.orderDetails);
                 setIsSaving(false);
             }
             else {
@@ -87,7 +87,7 @@ export const ConfirmationPage = () => {
                     if (transaction_status === "settlement") {
                         newStatus = "Preparing Food";
                         updateStock();
-                        updateMenuSolds(orderDetails.orderDetails);
+                        await updateMenuSolds(orderDetails.orderDetails);
                     } else if (transaction_status === "pending") {
                         newStatus = "Waiting For Payment On Cashier";
                     } else {
