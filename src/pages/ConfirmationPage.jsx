@@ -13,11 +13,17 @@ function removeSessionStorage(txid) {
 }
 
 function updateMenuSolds(orderDetails) {
-  if (!Array.isArray(orderDetails)) return;
+  if (!orderDetails) return;
 
-  orderDetails.forEach(element => {
+  // Handle both array or object (Firestore sometimes gives object with numeric keys)
+  const items = Array.isArray(orderDetails)
+    ? orderDetails
+    : Object.values(orderDetails);
+
+  items.forEach(element => {
     const menuRef = ref(db, `menu_solds/${element.id}`);
     runTransaction(menuRef, (current) => {
+      // If it doesn't exist yet, start from 0
       return (current || 0) + element.jumlah;
     });
   });
