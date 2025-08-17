@@ -2,7 +2,6 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase/firebaseConfig";
 import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
-import { getDatabase, ref, runTransaction } from "firebase/database";
 
 function removeSessionStorage(txid) {
     sessionStorage.removeItem("fullName");
@@ -12,21 +11,18 @@ function removeSessionStorage(txid) {
     sessionStorage.removeItem(`payment_${txid}`);
 }
 
-function updateMenuSolds(orderDetails) {
-  if (!orderDetails) return;
+async function updateMenuSolds(orderDetails) {
+  if (!Array.isArray(orderDetails)) return;
 
-  // Handle both array or object (Firestore sometimes gives object with numeric keys)
-  const items = Array.isArray(orderDetails)
-    ? orderDetails
-    : Object.values(orderDetails);
-
-  items.forEach(element => {
-    const menuRef = ref(db, `menu_solds/${element.id}`);
-    runTransaction(menuRef, (current) => {
-      // If it doesn't exist yet, start from 0
-      return (current || 0) + element.jumlah;
+  const updates = orderDetails.map(async (item) => {
+    const menuRef = doc(db, "menu_makanan", item.id);
+    await updateDoc(menuRef, {
+      solds: increment(item.jumlah),
     });
   });
+
+  // Run all updates in parallel
+  await Promise.all(updates);
 }
 
 export const ConfirmationPage = () => {
@@ -82,24 +78,23 @@ export const ConfirmationPage = () => {
                     const snap = await getDoc(docRef);
 
                     if (snap.exists()) {
-                        const data = snap.data();
-                        setOrderDetails(data);
+                        setOrderDetails(snap.data());
+                    }
 
-                        let newStatus;
-                        if (transaction_status === "settlement") {
-                            newStatus = "Preparing Food";
-                            updateStock(data);
-                            updateMenuSolds(data.orderDetails);
-                        } else if (transaction_status === "pending") {
-                            newStatus = "Waiting For Payment On Cashier";
-                        } else {
-                            newStatus = "Order Canceled";
-                        }
+                    let newStatus;
+                    if (transaction_status === "settlement") {
+                        newStatus = "Preparing Food";
+                        updateStock();
+                        updateMenuSolds(orderDetails.orderDetails);
+                    } else if (transaction_status === "pending") {
+                        newStatus = "Waiting For Payment On Cashier";
+                    } else {
+                        newStatus = "Order Canceled";
+                    }
 
-                        if (status !== newStatus) {
-                            await updateDoc(docRef, { status: newStatus });
-                            setStatus(newStatus);
-                        }
+                    if (status !== newStatus) {
+                        await updateDoc(docRef, { status: newStatus });
+                        setStatus(newStatus);
                     }
                 } catch (err) {
                     console.error(err);
