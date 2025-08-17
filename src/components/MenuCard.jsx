@@ -21,8 +21,8 @@ const MenuCard = ({ id, name, cn, price, stocks, image, jumlah, tambah, kurang }
       </div>
 
       <div className='text-left'>
-        <h3 className='text-sm text-red-500 font-medium'>
-          {stocks < 1 ? "Stocks: Empty" : `Stocks: ${stocks}`}
+        <h3 className='text-sm font-medium'>
+          {stocks < 1 ? <div>Stocks: <span className='text-red-500'>Empty</span></div> : <div>Stocks: <span className='text-agro-color'>{stocks}</span></div>}
         </h3>
       </div>
 

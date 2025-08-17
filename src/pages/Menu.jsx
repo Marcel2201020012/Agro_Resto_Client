@@ -6,6 +6,8 @@ import { Link, useSearchParams } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 
+import { Navbar } from "../components/Navbar";
+
 function MenuCategory({ category, title, MenuData, jumlah, tambah, kurang }) {
   const filteredItems = MenuData
     .filter(item => item.category === category)
@@ -133,18 +135,26 @@ export const Menu = () => {
   const selectedMenu = MenuData.filter(item => jumlah[item.id] > 0).map(item => ({ ...item, jumlah: jumlah[item.id] }));
 
   return (
-    <div className="container min-h-screen overflow-x-hidden pt-8 pb-16">
+    <div className="min-h-screen overflow-x-hidden pb-16">
+      <Navbar />
 
-      <main>
-        <h1 className="text-left text-sm text-agro-color font-semibold mb-1">MENU LIST</h1>
-        <MenuCategory
-          category="Main Dish"
-          title="Main Dish"
-          MenuData={MenuData}
-          jumlah={jumlah}
-          tambah={tambah}
-          kurang={kurang}
-        />
+      <main className="container mt-16">
+        <section id="#">
+          <MenuCategory
+            category="Main Dish"
+            title="Main Dish"
+            MenuData={MenuData}
+            jumlah={jumlah}
+            tambah={tambah}
+            kurang={kurang}
+          />
+        </section>
+
+        <section id="Sides">
+          <br />
+        </section>
+        <br />
+        <br />
 
         <MenuCategory
           category="Sides"
@@ -155,6 +165,12 @@ export const Menu = () => {
           kurang={kurang}
         />
 
+        <section id="Coffee">
+          <br />
+        </section>
+        <br />
+        <br />
+
         <MenuCategory
           category="Coffee"
           title="Coffee"
@@ -163,6 +179,12 @@ export const Menu = () => {
           tambah={tambah}
           kurang={kurang}
         />
+
+        <section id="Non-Coffee">
+          <br />
+        </section>
+        <br />
+        <br />
 
         <MenuCategory
           category="Non-Coffee"
@@ -173,6 +195,12 @@ export const Menu = () => {
           kurang={kurang}
         />
 
+        <section id="Juice">
+          <br />
+        </section>
+        <br />
+        <br />
+
         <MenuCategory
           category="Juice"
           title="Juice"
@@ -181,6 +209,12 @@ export const Menu = () => {
           tambah={tambah}
           kurang={kurang}
         />
+
+        <section id="Tea">
+          <br />
+        </section>
+        <br />
+        <br />
 
         <MenuCategory
           category="Tea"
@@ -191,14 +225,25 @@ export const Menu = () => {
           kurang={kurang}
         />
 
+        <section id="Soft Drink">
+          <br />
+        </section>
+        <br />
+        <br />
         <MenuCategory
           category="Soft Drink"
-          title="Soft Drinks"
+          title="Soft Drink"
           MenuData={MenuData}
           jumlah={jumlah}
           tambah={tambah}
           kurang={kurang}
         />
+
+        <section id="Beer">
+          <br />
+        </section>
+        <br />
+        <br />
 
         <MenuCategory
           category="Beer"
@@ -221,7 +266,6 @@ export const Menu = () => {
         </Link>) : ("")}
 
       </main>
-
     </div>
   );
 };

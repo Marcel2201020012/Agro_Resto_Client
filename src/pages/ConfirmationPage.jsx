@@ -2,6 +2,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase/firebaseConfig";
 import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { getDatabase, ref, runTransaction } from "firebase/database";
 
 function removeSessionStorage(txid) {
     sessionStorage.removeItem("fullName");
@@ -9,6 +10,15 @@ function removeSessionStorage(txid) {
     sessionStorage.removeItem("jumlah_menu");
     // sessionStorage.removeItem("isSubmit");
     sessionStorage.removeItem(`payment_${txid}`);
+}
+
+function updateMenuSolds(order){
+    order.array.forEach(element => {
+        const menuRef = ref(db, `menu_solds/${element.id}`);
+        runTransaction(menuRef, (current) => {
+            return (current || 0) + element.jumlah;
+        })
+    });
 }
 
 export const ConfirmationPage = () => {
@@ -57,6 +67,7 @@ export const ConfirmationPage = () => {
                 setOrderDetails(stateData);
                 await updateDoc(docRef, { paymentUrl: paymentUrl });
                 await updateStock(stateData);
+                updateMenuSolds(orderDetails);
                 setIsSaving(false);
             }
             else {
@@ -71,6 +82,7 @@ export const ConfirmationPage = () => {
                     if (transaction_status === "settlement") {
                         newStatus = "Preparing Food";
                         updateStock();
+                        updateMenuSolds(orderDetails);
                     } else if (transaction_status === "pending") {
                         newStatus = "Waiting For Payment On Cashier";
                     } else {
