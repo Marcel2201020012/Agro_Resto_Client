@@ -13,14 +13,9 @@ function removeSessionStorage(txid) {
 }
 
 function updateMenuSolds(orderDetails) {
-  if (!orderDetails) return;
+  if (!Array.isArray(orderDetails)) return;
 
-  // Ensure array
-  const items = Array.isArray(orderDetails)
-    ? orderDetails
-    : Object.values(orderDetails);
-
-  items.forEach(element => {
+  orderDetails.forEach(element => {
     const menuRef = ref(db, `menu_solds/${element.id}`);
     runTransaction(menuRef, (current) => {
       return (current || 0) + element.jumlah;
@@ -74,7 +69,6 @@ export const ConfirmationPage = () => {
                 setOrderDetails(stateData);
                 await updateDoc(docRef, { paymentUrl: paymentUrl });
                 await updateStock(stateData);
-                updateMenuSolds(stateData.orderDetails);
                 setIsSaving(false);
             }
             else {
