@@ -74,7 +74,6 @@ function RecomendationCategory({ title, MenuData, jumlah, tambah, kurang }) {
 }
 
 export const Menu = () => {
-  const navigate = useNavigate();
   const [jumlah, setJumlah] = useState({});
 
   const [isLoaded, setIsLoaded] = useState(false);
