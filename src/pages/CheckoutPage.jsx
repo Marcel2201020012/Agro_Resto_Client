@@ -24,6 +24,9 @@ export const CheckoutPage = () => {
 
     const [showModal, setShowModal] = useState(false);
 
+    const [selectedOrderType, setSelectedOrderType] = useState("DINE-IN");
+    const orderType = ["DINE-IN", "TAKEAWAY"];
+
     const [fullName, setFullName] = useState("");
     const [fullNameError, setFullNameError] = useState("");
 
@@ -65,8 +68,8 @@ export const CheckoutPage = () => {
     };
 
     const handleEmptyNote = () => {
-        if (customerNote.trim().length < 1){
-        setCustomerNote("-");
+        if (customerNote.trim().length < 1) {
+            setCustomerNote("-");
         }
     };
 
@@ -129,6 +132,7 @@ export const CheckoutPage = () => {
                     console.log("Payment Success:", result);
 
                     const orderData = {
+                        orderType: orderType,
                         customerName: fullName,
                         orderDetails: selectedMenu,
                         notes: customerNote,
@@ -153,6 +157,7 @@ export const CheckoutPage = () => {
                     console.log("Payment Pending:", result);
 
                     const orderData = {
+                        orderType: orderType,
                         customerName: fullName,
                         orderDetails: selectedMenu,
                         notes: customerNote,
@@ -245,7 +250,24 @@ export const CheckoutPage = () => {
 
             {/* Buyer Details */}
             <h2 className="text-2xl font-bold mt-10 mb-4">Customer Detail</h2>
+
             <div className="space-y-4">
+                <div className="flex justify-center gap-4">
+                    {orderType.map((option) => (
+                        <button
+                            key={option}
+                            onClick={() => setSelectedOrderType(option)}
+                            className={`w-1/2 py-3 font-semibold rounded-lg transition-all duration-300 shadow-md 
+            ${selectedOrderType === option
+                                    ? "bg-agro-color text-white shadow-lg"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                }`}
+                        >
+                            {option}
+                        </button>
+                    ))}
+                </div>
+
                 <div>
                     <label className="text-left block font-semibold mb-1">Full Name</label>
                     <input
