@@ -14,6 +14,18 @@ function MenuCategory({ category, title, MenuData, jumlah, tambah, kurang }) {
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name));
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("accessToken");
+
+    fetch(`/api/token?token=${token}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.access) return;
+      });
+  }, []);
+
+
   return (
     <>
       <h2 className="text-left text-2xl font-bold mb-4">{title}</h2>
@@ -39,15 +51,15 @@ function MenuCategory({ category, title, MenuData, jumlah, tambah, kurang }) {
 
 function RecomendationCategory({ title, MenuData, jumlah, tambah, kurang }) {
   const topItems = MenuData
-  .map(item => ({ ...item, solds: item.solds ?? 0 }))
-  .slice()
-  .sort((a, b) => {
-    if (b.solds !== a.solds) {
-      return b.solds - a.solds;
-    }
-    return a.name.localeCompare(b.name);
-  })
-  .slice(0, 5);
+    .map(item => ({ ...item, solds: item.solds ?? 0 }))
+    .slice()
+    .sort((a, b) => {
+      if (b.solds !== a.solds) {
+        return b.solds - a.solds;
+      }
+      return a.name.localeCompare(b.name);
+    })
+    .slice(0, 5);
 
   return (
     <>
