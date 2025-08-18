@@ -68,6 +68,7 @@ export const ConfirmationPage = () => {
 
             if (stateData) {
                 //confirmation flow for normal success payment
+                console.log("State Data Exist -> normal operation");
                 setStatus(stateData.status);
                 setOrderDetails(stateData);
                 await updateDoc(docRef, { paymentUrl: paymentUrl });
@@ -77,6 +78,7 @@ export const ConfirmationPage = () => {
             }
             else {
                 try {
+                    console.log(`transaction_status: ${transaction_status}`);
                     const snap = await getDoc(docRef);
 
                     if (snap.exists()) {
@@ -87,7 +89,7 @@ export const ConfirmationPage = () => {
                     if (transaction_status === "settlement") {
                         newStatus = "Preparing Food";
                         updateStock();
-                        await updateMenuSolds(orderDetails.orderDetails);
+                        updateMenuSolds(orderDetails.orderDetails);
                     } else if (transaction_status === "pending") {
                         newStatus = "Waiting For Payment On Cashier";
                     } else {
