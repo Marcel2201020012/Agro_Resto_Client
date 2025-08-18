@@ -90,6 +90,7 @@ export const CheckoutPage = () => {
     };
 
     const handleConfirm = async () => {
+        console.log(`order type: ${selectedOrderType}`)
         Object.keys(sessionStorage)
             .filter(key => key.startsWith('payment_'))
             .forEach(key => sessionStorage.removeItem(key));
