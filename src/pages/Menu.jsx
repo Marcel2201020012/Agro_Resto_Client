@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import MenuCard from "../components/MenuCard";
 import { useEffect, useState, useRef } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, Navigate, useNavigate } from "react-router-dom";
 
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
@@ -13,18 +13,6 @@ function MenuCategory({ category, title, MenuData, jumlah, tambah, kurang }) {
     .filter(item => item.category === category)
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name));
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("accessToken");
-
-    fetch(`/api/token?token=${token}`)
-      .then(res => res.json())
-      .then(data => {
-        if (!data.access) return;
-      });
-  }, []);
-
 
   return (
     <>
@@ -86,6 +74,7 @@ function RecomendationCategory({ title, MenuData, jumlah, tambah, kurang }) {
 }
 
 export const Menu = () => {
+  const navigate = useNavigate();
   const [jumlah, setJumlah] = useState({});
 
   const [isLoaded, setIsLoaded] = useState(false);
@@ -94,6 +83,17 @@ export const Menu = () => {
 
   const [searchParams] = useSearchParams();
   const tableId = searchParams.get("tableId");
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("accessToken");
+
+    fetch(`/api/token?token=${token}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.access)  navigate("/access-denied");
+      });
+  }, []);
 
   useEffect(() => {
     const fetchMenu = async () => {

@@ -2,6 +2,7 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import { Menu } from './pages/Menu';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { ConfirmationPage } from './pages/ConfirmationPage';
+import { Notfound } from "./pages/NotFound";
 
 function App(){
   return(
@@ -12,6 +13,7 @@ function App(){
           <Route path='/menu' element={<Menu/>}/>
           <Route path='/checkout' element={<CheckoutPage/>}/>{/*  checkout */}
           <Route path='/confirm' element={<ConfirmationPage/>}/> 
+          <Route path="*" element={<Notfound />} />
         </Routes>
       </BrowserRouter>
     </>
