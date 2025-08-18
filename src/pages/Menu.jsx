@@ -37,6 +37,42 @@ function MenuCategory({ category, title, MenuData, jumlah, tambah, kurang }) {
   );
 }
 
+function RecomendationCategory({ title, MenuData, jumlah, tambah, kurang }) {
+  const topItems = MenuData
+  .map(item => ({ ...item, solds: item.solds ?? 0 }))
+  .slice()
+  .sort((a, b) => {
+    if (b.solds !== a.solds) {
+      return b.solds - a.solds;
+    }
+    return a.name.localeCompare(b.name);
+  })
+  .slice(0, 5);
+
+  return (
+    <>
+      <h2 className="text-left text-2xl font-bold mb-4">{title}</h2>
+      <div className="grid grid-cols-2 gap-4 max-h-screen scrollbar-hide overflow-y-scroll mb-4">
+        {topItems.map(item => (
+          <MenuCard
+            key={item.id}
+            id={item.id}
+            name={item.name}
+            cn={item.cn}
+            desc={item.desc}
+            price={item.price}
+            stocks={item.stocks}
+            image={item.image}
+            jumlah={jumlah[item.id] || 0}
+            tambah={tambah}
+            kurang={kurang}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
+
 export const Menu = () => {
   const [jumlah, setJumlah] = useState({});
 
@@ -139,16 +175,31 @@ export const Menu = () => {
       <Navbar />
 
       <main className="container mt-16">
+
         <section id="#">
-          <MenuCategory
-            category="Main Dish"
-            title="Main Dish"
+          <RecomendationCategory
+            title="Best Seller"
             MenuData={MenuData}
             jumlah={jumlah}
             tambah={tambah}
             kurang={kurang}
           />
         </section>
+
+        <section id="Main Dish">
+          <br />
+        </section>
+        <br />
+        <br />
+
+        <MenuCategory
+          category="Main Dish"
+          title="Main Dish"
+          MenuData={MenuData}
+          jumlah={jumlah}
+          tambah={tambah}
+          kurang={kurang}
+        />
 
         <section id="Sides">
           <br />

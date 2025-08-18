@@ -1,10 +1,14 @@
-import { Minus, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { Minus, Plus, X } from 'lucide-react';
 
-const MenuCard = ({ id, name, cn, price, stocks, image, jumlah, tambah, kurang }) => {
+const MenuCard = ({ id, name, cn, desc, price, stocks, image, jumlah, tambah, kurang }) => {
+  const [openPopUp, setOpenPopUp] = useState(false);
+
   return (
     <div className="relative bg-white rounded-xl shadow-lg p-4">
       <div className="lg:flex">
         <img
+          onClick={() => setOpenPopUp(true)}
           src={image}
           alt={name}
           className="h-32 lg:h-64 object-cover rounded-md"
@@ -46,6 +50,32 @@ const MenuCard = ({ id, name, cn, price, stocks, image, jumlah, tambah, kurang }
           <Plus size={16} />
         </button>
       </div>
+
+      {openPopUp && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="relative bg-white rounded-2xl shadow-xl p-6 w-96 max-w-3/4">
+
+            <button
+              onClick={() => setOpenPopUp(false)}
+              className="absolute top-3 right-3 text-gray-600 hover:text-black"
+            >
+              <X size={24} />
+            </button>
+
+            <img
+              src={image}
+              alt={name}
+              className="w-full h-48 object-cover rounded-lg"
+            />
+
+            <h2 className="mt-4 text-xl font-bold">{name}</h2>
+            <h2 className="text-xl font-bold">{cn}</h2>
+            <p className="text-gray-500 mb-2">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)}</p>
+            <p className="overflow-y-auto pr-2 text-gray-700">{desc}</p>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

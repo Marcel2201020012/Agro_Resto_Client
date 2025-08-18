@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import CheckoutCard from '../components/CheckoutCard';
 import { db } from "../../firebase/firebaseConfig";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { use } from 'react';
 
 function generateTransactionId(tableId = "XX") {
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -24,8 +25,10 @@ export const CheckoutPage = () => {
 
     const [showModal, setShowModal] = useState(false);
 
-    const [fullName, setFullName] = useState('');
+    const [fullName, setFullName] = useState("");
     const [fullNameError, setFullNameError] = useState("");
+
+    const [customerNote, setCustomerNote] = useState("");
 
     const [isSaving, setIsSaving] = useState(false);
 
@@ -62,6 +65,12 @@ export const CheckoutPage = () => {
         return true;
     };
 
+    const handleEmptyNote = () => {
+        if (customerNote.trim().length < 1){
+        setCustomerNote("-");
+        }
+    };
+
     // const validatePaymentMethode = () => {
     //     if (payment === "") {
     //         setPaymentError("Please choose a payment methode.");
@@ -71,8 +80,9 @@ export const CheckoutPage = () => {
     //     return true;
     // }
 
-    const handleNextClick = (e) => {
+    const handlePayNow = (e) => {
         e.preventDefault();
+        handleEmptyNote();
         if (!validateFullName()) return;
         setShowModal(true);
     };
@@ -122,6 +132,7 @@ export const CheckoutPage = () => {
                     const orderData = {
                         customerName: fullName,
                         orderDetails: selectedMenu,
+                        notes,
                         total,
                         tableId,
                         status: "Preparing Food",
@@ -145,6 +156,7 @@ export const CheckoutPage = () => {
                     const orderData = {
                         customerName: fullName,
                         orderDetails: selectedMenu,
+                        notes,
                         total,
                         tableId,
                         status: "Waiting For Payment On Cashier",
@@ -170,14 +182,15 @@ export const CheckoutPage = () => {
                 onClose: async () => {
                     setIsProcessing(false);
                     console.log("Payment popup closed");
-                    const orderData = {
-                        customerName: fullName,
-                        orderDetails: selectedMenu,
-                        total,
-                        tableId,
-                        status: "Waiting For Payment On Cashier",
-                        createdAt: serverTimestamp(),
-                    };
+                    // const orderData = {
+                    //     customerName: fullName,
+                    //     orderDetails: selectedMenu,
+                    //     notes,
+                    //     total,
+                    //     tableId,
+                    //     status: "Waiting For Payment On Cashier",
+                    //     createdAt: serverTimestamp(),
+                    // };
 
                     //sessionStorage.setItem("isSubmit", 1);
                     //await setDoc(doc(db, "transaction_id", transaction_id), orderData);
@@ -239,12 +252,24 @@ export const CheckoutPage = () => {
                     <input
                         className={`w-full border p-2 rounded ${fullNameError ? "border-red-500" : ""}`}
                         value={fullName}
+                        placeholder='Enter your full name'
                         onChange={e => setFullName(e.target.value)}
                         onBlur={validateFullName}
                     />
                     {fullNameError && (
                         <p className="text-red-500 mt-1 text-sm">{fullNameError}</p>
                     )}
+                </div>
+
+                <div>
+                    <label className="text-left block font-semibold mb-1">Notes</label>
+                    <input
+                        className="w-full border p-2 rounded"
+                        value={customerNote}
+                        placeholder='Enter notes or request'
+                        onChange={e => setCustomerNote(e.target.value)}
+                        onBlur={handleEmptyNote}
+                    />
                 </div>
 
                 {/* <div>
@@ -290,7 +315,7 @@ export const CheckoutPage = () => {
                     Back
                 </button>
                 <button
-                    onClick={handleNextClick}
+                    onClick={handlePayNow}
                     disabled={isProcessing}
                     className={`bg-agro-color rounded-full text-white px-6 py-2 flex ${isProcessing ? "opacity-50 cursor-not-allowed" : ""
                         }`}

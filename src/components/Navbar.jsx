@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 
 const navigationItems = [
-    { name: "Main Dish", href: "#" },
+    { name: "Best Seller", href: "#" },
+    { name: "Main Dish", href: "#Main Dish" },
     { name: "Sides", href: "#Sides" },
     { name: "Coffee", href: "#Coffee" },
     { name: "Non-Coffee", href: "#Non-Coffee" },

@@ -180,6 +180,11 @@ export const ConfirmationPage = () => {
                     </div> */}
 
                     <div>
+                        <div className="font-bold">Notes</div>
+                        <div>{orderDetails.notes}</div>
+                    </div>
+
+                    <div>
                         <div className="font-bold">Status</div>
                         <div>{status}</div>
                     </div>
