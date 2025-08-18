@@ -72,7 +72,7 @@ export const ConfirmationPage = () => {
                 setOrderDetails(stateData);
                 await updateDoc(docRef, { paymentUrl: paymentUrl });
                 await updateStock(stateData);
-                await updateMenuSolds(orderDetails.orderDetails);
+                await updateMenuSolds(stateData.orderDetails);
                 setIsSaving(false);
             }
             else {
