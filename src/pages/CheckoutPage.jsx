@@ -132,7 +132,7 @@ export const CheckoutPage = () => {
                     const orderData = {
                         customerName: fullName,
                         orderDetails: selectedMenu,
-                        notes,
+                        notes: customerNote,
                         total,
                         tableId,
                         status: "Preparing Food",
@@ -156,7 +156,7 @@ export const CheckoutPage = () => {
                     const orderData = {
                         customerName: fullName,
                         orderDetails: selectedMenu,
-                        notes,
+                        notes: customerNote,
                         total,
                         tableId,
                         status: "Waiting For Payment On Cashier",
