@@ -86,7 +86,7 @@ export const Menu = () => {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("accessToken");
+    const token = urlParams.get("token");
 
     fetch(`/api/token?token=${token}`)
       .then(res => res.json())
