@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import MenuCard from "../components/MenuCard";
 import { useEffect, useState, useRef } from "react";
-import { Link, useSearchParams, Navigate, useNavigate } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
@@ -83,17 +83,6 @@ export const Menu = () => {
 
   const [searchParams] = useSearchParams();
   const tableId = searchParams.get("tableId");
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-
-    fetch(`/api/token?token=${token}`)
-      .then(res => res.json())
-      .then(data => {
-        if (!data.access)  navigate("/access-denied");
-      });
-  }, []);
 
   useEffect(() => {
     const fetchMenu = async () => {
