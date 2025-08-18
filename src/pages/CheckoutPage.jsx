@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react';
 import CheckoutCard from '../components/CheckoutCard';
 import { db } from "../../firebase/firebaseConfig";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { use } from 'react';
 
 function generateTransactionId(tableId = "XX") {
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
