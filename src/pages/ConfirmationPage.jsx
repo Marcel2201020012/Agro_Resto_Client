@@ -166,7 +166,7 @@ export const ConfirmationPage = () => {
 
                     <div>
                         <div className="font-bold">Order Type</div>
-                        <div>{orderDetails.orderType}</div>
+                        <div>{orderDetails.selectedOrderType}</div>
                     </div>
 
                     <div>

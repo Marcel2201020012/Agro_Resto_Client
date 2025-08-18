@@ -132,7 +132,7 @@ export const CheckoutPage = () => {
                     console.log("Payment Success:", result);
 
                     const orderData = {
-                        orderType: orderType,
+                        orderType: selectedOrderType,
                         customerName: fullName,
                         orderDetails: selectedMenu,
                         notes: customerNote,
@@ -157,7 +157,7 @@ export const CheckoutPage = () => {
                     console.log("Payment Pending:", result);
 
                     const orderData = {
-                        orderType: orderType,
+                        orderType: selectedOrderType,
                         customerName: fullName,
                         orderDetails: selectedMenu,
                         notes: customerNote,
