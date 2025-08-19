@@ -88,6 +88,7 @@ export const ConfirmationPage = () => {
         };
 
         if (location.state) {
+            console.log("using bootstraping value");
             bootstrapFromNavigationState(location.state);
             navigate(`${location.pathname}${location.search}`, { replace: true });
         }
