@@ -107,13 +107,13 @@ export const ConfirmationPage = () => {
             try {
                 let newStatus;
 
-                if (data.transaction_status === "settlement" || status !== "Preparing Food") {
+                if (data.transaction_status === "settlement" && status !== "Preparing Food") {
                     // Update stocks and solds safely
                     await updateStock(data);               // Make sure this function only updates 'stocks'
                     await updateMenuSolds(data.orderDetails); // Only updates 'solds'
 
                     newStatus = "Preparing Food";
-                } else if (data.transaction_status === "pending" || status !== "Waiting For Payment On Cashier") {
+                } else if (data.transaction_status === "pending" && status !== "Waiting For Payment On Cashier") {
                     newStatus = "Waiting For Payment On Cashier";
                 }
 
