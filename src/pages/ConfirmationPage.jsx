@@ -67,55 +67,64 @@ export const ConfirmationPage = () => {
 
     useEffect(() => {
         const docRef = doc(db, "transaction_id", orderId);
-        const data = snap.data();
+
+        const bootstrapFromNavigationState = async (stateData) => {
+            try {
+                setStatus(stateData.status);
+                setOrderDetails(stateData);
+
+                // Update payment URL and solds safely
+                await updateDoc(docRef, { paymentUrl });
+                await updateMenuSolds(stateData.orderDetails);
+
+                setIsSaving(false);
+            } catch (err) {
+                console.error("Error bootstrapping state:", err);
+                setIsSaving(false);
+            }
+        };
 
         // If navigation provided state (fast initial UI)
-        if (location.state && data.transaction_status === null) {
-            const stateData = location.state;
+        if (location.state) {
             console.log("State Data Exist -> bootstrap from navigation state");
+            bootstrapFromNavigationState(location.state);
 
-            setStatus(stateData.status);
-            setOrderDetails(stateData);
-
-            (async () => {
-                await updateDoc(docRef, { paymentUrl });
-                // await updateStock(stateData);
-                await updateMenuSolds(stateData.orderDetails);
-                setIsSaving(false);
-            })();
-
-            // ✅ Clear state (important: include search to preserve query params)
+            // Clear navigation state
             navigate(`${location.pathname}${location.search}`, { replace: true });
         }
 
         // Firestore real-time updates (always active)
         const unsubscribe = onSnapshot(docRef, async (snap) => {
+            if (!snap.exists()) {
+                console.log("No such document!");
+                setStatus("Waiting For Payment On Cashier");
+                return;
+            }
+
+            const data = snap.data();
+            setOrderDetails(data);
+
             try {
-                if (snap.exists()) {
-                    setOrderDetails(data);
+                let newStatus;
 
-                    let newStatus;
-                    if (data.transaction_status === "settlement") {
-                        newStatus = "Preparing Food";
-                        updateStock();
-                        updateMenuSolds(data?.orderDetails);
-                    } else if (data.transaction_status === "pending") {
-                        newStatus = "Waiting For Payment On Cashier";
-                    }
+                if (data.transaction_status === "settlement" && status !== "Preparing Food") {
+                    // Update stocks and solds safely
+                    await updateStock(data);               // Make sure this function only updates 'stocks'
+                    await updateMenuSolds(data.orderDetails); // Only updates 'solds'
 
-                    if (newStatus !== undefined) {
-                        await updateDoc(docRef, { status: newStatus });
-                        setStatus(newStatus);
-                    }
-                    else {
-                        setStatus(data.status);
-                    }
+                    newStatus = "Preparing Food";
+                } else if (data.transaction_status === "pending" && status !== "Waiting For Payment On Cashier") {
+                    newStatus = "Waiting For Payment On Cashier";
+                }
+
+                if (newStatus) {
+                    await updateDoc(docRef, { status: newStatus });
+                    setStatus(newStatus);
                 } else {
-                    console.log("No such document!");
-                    setStatus("Waiting For Payment On Cashier");
+                    setStatus(data.status);
                 }
             } catch (err) {
-                console.error(err);
+                console.error("Error processing snapshot:", err);
                 setStatus("Waiting For Payment On Cashier");
             } finally {
                 setIsSaving(false);
@@ -143,8 +152,8 @@ export const ConfirmationPage = () => {
         //         });
 
         return () => unsubscribe();
+    }, [orderId, location, paymentUrl, navigate, status]);
 
-    }, [orderId, location, paymentUrl, navigate]);
 
     const handlePayNow = () => {
         window.location.href = paymentUrl;
