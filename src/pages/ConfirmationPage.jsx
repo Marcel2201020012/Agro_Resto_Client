@@ -74,6 +74,7 @@ export const ConfirmationPage = () => {
                 await updateStock(stateData);
                 await updateMenuSolds(stateData.orderDetails);
                 setIsSaving(false);
+                stateData = "";
             }
             else {
                 const unsubscribe = onSnapshot(docRef, async (snap) => {
