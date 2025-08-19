@@ -149,7 +149,7 @@ export const ConfirmationPage = () => {
     if (isSaving) {
         return (
             <div className="container min-h-screen flex justify-center items-center">
-                <p className="text-lg font-semibold">Saving your order...</p>
+                <p className="text-lg font-semibold">Loading your order...</p>
             </div>
         )
     }
