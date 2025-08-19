@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { db } from "../../firebase/firebaseConfig";
 import { doc, onSnapshot, updateDoc, increment } from "firebase/firestore";
 
@@ -67,17 +67,18 @@ export const ConfirmationPage = () => {
     useEffect(() => {
         const docRef = doc(db, "transaction_id", orderId);
 
+        const stockUpdatedRef = useRef(false);
+
         const bootstrapFromNavigationState = async (stateData) => {
             try {
                 setStatus(stateData.status);
                 setOrderDetails(stateData);
 
-                // Update payment URL safely
                 await updateDoc(docRef, { paymentUrl });
 
-                // Update stock if the order is already in "Preparing Food"
-                if (stateData.status === "Preparing Food") {
-                    await updateStock(stateData); // pass the order data to update stocks
+                if (stateData.status === "Preparing Food" && !stockUpdatedRef.current) {
+                    await updateStock(stateData);
+                    stockUpdatedRef.current = true; // mark as updated
                 }
 
                 await updateMenuSolds(stateData.orderDetails);
@@ -89,52 +90,22 @@ export const ConfirmationPage = () => {
             }
         };
 
-        // If navigation provided state (fast initial UI)
-        if (location.state) {
-            console.log("State Data Exist -> bootstrap from navigation state");
-            bootstrapFromNavigationState(location.state);
-
-            // Clear navigation state
-            navigate(`${location.pathname}${location.search}`, { replace: true });
-        }
-
-        // Firestore real-time updates (always active)
         const unsubscribe = onSnapshot(docRef, async (snap) => {
-            if (!snap.exists()) {
-                console.log("No such document!");
-                setStatus("Waiting For Payment On Cashier");
-                return;
-            }
+            if (!snap.exists()) return;
 
             const data = snap.data();
             setOrderDetails(data);
 
             try {
-                let newStatus;
-
-                if (data.transaction_status === "settlement" && status !== "Preparing Food") {
-                    // Update stocks and solds safely
-                    await updateStock(data);               // Make sure this function only updates 'stocks'
-                    await updateMenuSolds(data.orderDetails); // Only updates 'solds'
-
-                    newStatus = "Preparing Food";
-                } else if (data.transaction_status === "pending" && status !== "Waiting For Payment On Cashier") {
-                    newStatus = "Waiting For Payment On Cashier";
-                }
-
-                if (newStatus) {
-                    await updateDoc(docRef, { status: newStatus });
-                    setStatus(newStatus);
-                } else {
-                    setStatus(data.status);
+                if (data.transaction_status === "settlement" && data.status !== "Preparing Food" && !stockUpdatedRef.current) {
+                    await updateStock(data);
+                    stockUpdatedRef.current = true; // mark as updated
                 }
             } catch (err) {
-                console.error("Error processing snapshot:", err);
-                setStatus("Waiting For Payment On Cashier");
-            } finally {
-                setIsSaving(false);
+                console.error(err);
             }
         });
+
 
         // Send email via Formspree
         //         await fetch("https://formspree.io/f/movlppyb", {
