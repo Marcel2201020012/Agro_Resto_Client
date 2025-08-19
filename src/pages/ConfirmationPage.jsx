@@ -67,9 +67,10 @@ export const ConfirmationPage = () => {
 
     useEffect(() => {
         const docRef = doc(db, "transaction_id", orderId);
+        const data = snap.data();
 
         // If navigation provided state (fast initial UI)
-        if (location.state) {
+        if (location.state && data.transaction_status === null) {
             const stateData = location.state;
             console.log("State Data Exist -> bootstrap from navigation state");
 
@@ -91,7 +92,6 @@ export const ConfirmationPage = () => {
         const unsubscribe = onSnapshot(docRef, async (snap) => {
             try {
                 if (snap.exists()) {
-                    const data = snap.data();
                     setOrderDetails(data);
 
                     let newStatus;
