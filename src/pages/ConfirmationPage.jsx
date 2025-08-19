@@ -1,7 +1,7 @@
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase/firebaseConfig";
-import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc, increment } from "firebase/firestore";
 
 function removeSessionStorage(txid) {
     sessionStorage.removeItem("fullName");
