@@ -12,17 +12,17 @@ function removeSessionStorage(txid) {
 }
 
 async function updateMenuSolds(orderDetails) {
-  if (!Array.isArray(orderDetails)) return;
+    if (!Array.isArray(orderDetails)) return;
 
-  const updates = orderDetails.map(async (item) => {
-    const menuRef = doc(db, "menu_makanan", item.id);
-    await updateDoc(menuRef, {
-      solds: increment(item.jumlah),
+    const updates = orderDetails.map(async (item) => {
+        const menuRef = doc(db, "menu_makanan", item.id);
+        await updateDoc(menuRef, {
+            solds: increment(item.jumlah),
+        });
     });
-  });
 
-  // Run all updates in parallel
-  await Promise.all(updates);
+    // Run all updates in parallel
+    await Promise.all(updates);
 }
 
 export const ConfirmationPage = () => {
@@ -53,15 +53,19 @@ export const ConfirmationPage = () => {
     const updateStock = async (details) => {
         if (!details?.orderDetails) return;
 
-        const batchUpdates = details.orderDetails.map(item => {
-            const menuRef = doc(db, "menu_makanan", item.id);
-            return updateDoc(menuRef, { stocks: increment(-item.jumlah) });
+        const batchUpdates = details.orderDetails.map(async (item) => {
+            try {
+                const menuRef = doc(db, "menu_makanan", item.id);
+                await updateDoc(menuRef, { stocks: increment(-item.jumlah) });
+            } catch (err) {
+                console.error(`Failed to update stock for ${item.id}:`, err);
+            }
         });
 
         await Promise.all(batchUpdates);
     };
 
-     useEffect(() => {
+    useEffect(() => {
         const docRef = doc(db, "transaction_id", orderId);
 
         // If navigation provided state (fast initial UI)
