@@ -96,9 +96,7 @@ export const ConfirmationPage = () => {
                         updateMenuSolds(data?.orderDetails);
                     } else if (data.transaction_status === "pending") {
                         newStatus = "Waiting For Payment On Cashier";
-                    } else {
-                        newStatus = "Order Canceled";
-                    }
+                    } 
 
                     if (data.status !== newStatus) {
                         await updateDoc(docRef, { status: newStatus });
