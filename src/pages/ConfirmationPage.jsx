@@ -30,6 +30,7 @@ export const ConfirmationPage = () => {
     const navigate = useNavigate();
     // const payment = location.state?.payment || "";
     const [status, setStatus] = useState("");
+    const transaction_status = searchParams.get("transaction_status");
     const [orderDetails, setOrderDetails] = useState(null);
 
     const [searchParams] = useSearchParams();
@@ -93,13 +94,6 @@ export const ConfirmationPage = () => {
             navigate(`${location.pathname}${location.search}`, { replace: true });
         }
 
-        const redirectCheck =
-            sessionStorage.getItem(`payment_${orderId}`) || transaction_status;
-        if (redirectCheck === "") {
-            removeSessionStorage(orderId);
-            navigate(`/menu?tableId=${tableId}`, { replace: true });
-        }
-
         const unsubscribe = onSnapshot(docRef, async (snap) => {
             if (!snap.exists() || !isMounted) return;
 
@@ -108,7 +102,7 @@ export const ConfirmationPage = () => {
             setOrderDetails(data);
 
             try {
-                if (redirectCheck === "settlement" && data.status !== "Preparing Food") {
+                if (data.transaction_status === "settlement" && data.status !== "Preparing Food") {
                     console.log("run the first condition");
                     await updateStock(data);
                     await updateMenuSolds(data.orderDetails);
@@ -116,7 +110,7 @@ export const ConfirmationPage = () => {
                         await updateDoc(docRef, { status: "Preparing Food" });
                         setStatus("Preparing Food");
                     }
-                } else if (redirectCheck === "pending" && data.status !== "Waiting For Payment On Cashier") {
+                } else if (data.transaction_status === "pending" && data.status !== "Waiting For Payment On Cashier") {
                     console.log("run the second condition");
                     if (isMounted) {
                         await updateDoc(docRef, { status: "Waiting For Payment On Cashier" });
@@ -133,6 +127,13 @@ export const ConfirmationPage = () => {
                 if (isMounted) setIsSaving(false);
             }
         });
+
+        const redirectCheck =
+            sessionStorage.getItem(`payment_${orderId}`) || transaction_status;
+        if (redirectCheck === "") {
+            removeSessionStorage(orderId);
+            navigate(`/menu?tableId=${tableId}`, { replace: true });
+        }
 
         // Send email via Formspree
         //         await fetch("https://formspree.io/f/movlppyb", {
