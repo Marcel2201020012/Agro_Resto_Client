@@ -1,7 +1,7 @@
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase/firebaseConfig";
-import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { doc, getDoc, updateDoc, increment, onSnapshot } from "firebase/firestore";
 
 function removeSessionStorage(txid) {
     sessionStorage.removeItem("fullName");
@@ -12,17 +12,16 @@ function removeSessionStorage(txid) {
 }
 
 async function updateMenuSolds(orderDetails) {
-  if (!Array.isArray(orderDetails)) return;
+    if (!Array.isArray(orderDetails)) return;
 
-  const updates = orderDetails.map(async (item) => {
-    const menuRef = doc(db, "menu_makanan", item.id);
-    await updateDoc(menuRef, {
-      solds: increment(item.jumlah),
+    const updates = orderDetails.map(async (item) => {
+        const menuRef = doc(db, "menu_makanan", item.id);
+        await updateDoc(menuRef, {
+            solds: increment(item.jumlah),
+        });
     });
-  });
 
-  // Run all updates in parallel
-  await Promise.all(updates);
+    await Promise.all(updates);
 }
 
 export const ConfirmationPage = () => {
@@ -77,35 +76,41 @@ export const ConfirmationPage = () => {
                 setIsSaving(false);
             }
             else {
-                try {
-                    console.log(`transaction_status: ${transaction_status}`);
-                    const snap = await getDoc(docRef);
+                const unsubscribe = onSnapshot(docRef, async (snap) => {
+                    try {
+                        if (snap.exists()) {
+                            const data = snap.data();
+                            setOrderDetails(data);
 
-                    if (snap.exists()) {
-                        setOrderDetails(snap.data());
-                    }
+                            let newStatus;
+                            if (data.transaction_status === "settlement") {
+                                newStatus = "Preparing Food";
+                                updateStock();
+                                updateMenuSolds(data?.orderDetails);
+                            } else if (data.transaction_status === "pending") {
+                                newStatus = "Waiting For Payment On Cashier";
+                            } else {
+                                newStatus = "Order Canceled";
+                            }
 
-                    let newStatus;
-                    if (transaction_status === "settlement") {
-                        newStatus = "Preparing Food";
-                        updateStock();
-                        updateMenuSolds(orderDetails?.orderDetails);
-                    } else if (transaction_status === "pending") {
-                        newStatus = "Waiting For Payment On Cashier";
-                    } else {
-                        newStatus = "Order Canceled";
+                            if (data.status !== newStatus) {
+                                await updateDoc(docRef, { status: newStatus });
+                                setStatus(newStatus);
+                            }
+                        } else {
+                            console.log("No such document!");
+                            setStatus("Waiting For Payment On Cashier");
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        setStatus("Waiting For Payment On Cashier");
+                    } finally {
+                        setIsSaving(false);
                     }
+                });
 
-                    if (status !== newStatus) {
-                        await updateDoc(docRef, { status: newStatus });
-                        setStatus(newStatus);
-                    }
-                } catch (err) {
-                    console.error(err);
-                    setStatus("Waiting For Payment On Cashier");
-                } finally {
-                    setIsSaving(false);
-                }
+                // cleanup listener when component unmounts
+                return () => unsubscribe();
             }
 
             const redirectCheck =
@@ -146,7 +151,7 @@ export const ConfirmationPage = () => {
     if (isSaving) {
         return (
             <div className="container min-h-screen flex justify-center items-center">
-                <p className="text-lg font-semibold">Saving your order...</p>
+                <p className="text-lg font-semibold">Loading your order...</p>
             </div>
         )
     }
