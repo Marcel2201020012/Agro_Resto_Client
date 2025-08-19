@@ -75,7 +75,9 @@ export const ConfirmationPage = () => {
 
                 // Update payment URL and solds safely
                 await updateDoc(docRef, { paymentUrl });
-                await updateStock(stateData);
+                if (stateData.status === "Preparing Food") {
+                    await updateStock(stateData);
+                }
                 await updateMenuSolds(stateData.orderDetails);
 
                 setIsSaving(false);
