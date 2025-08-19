@@ -61,89 +61,90 @@ export const ConfirmationPage = () => {
     };
 
     useEffect(() => {
-        const run = async () => {
-            const stateData = location.state;
-            const docRef = doc(db, "transaction_id", orderId);
+        const docRef = doc(db, "transaction_id", orderId);
 
-            if (stateData) {
-                //confirmation flow for normal success payment
-                console.log("State Data Exist -> normal operation");
-                setStatus(stateData.status);
-                setOrderDetails(stateData);
-                await updateDoc(docRef, { paymentUrl: paymentUrl });
+        // if state data is passed, do initial update
+        if (location.state) {
+            const stateData = location.state;
+            console.log("State Data Exist -> normal operation");
+
+            setStatus(stateData.status);
+            setOrderDetails(stateData);
+
+            (async () => {
+                await updateDoc(docRef, { paymentUrl });
                 await updateStock(stateData);
                 await updateMenuSolds(stateData.orderDetails);
                 setIsSaving(false);
-                stateData = "";
-            }
-            else {
-                const unsubscribe = onSnapshot(docRef, async (snap) => {
-                    try {
-                        if (snap.exists()) {
-                            const data = snap.data();
-                            setOrderDetails(data);
+            })();
+        }
 
-                            let newStatus;
-                            if (data.transaction_status === "settlement") {
-                                newStatus = "Preparing Food";
-                                updateStock();
-                                updateMenuSolds(data?.orderDetails);
-                            } else if (data.transaction_status === "pending") {
-                                newStatus = "Waiting For Payment On Cashier";
-                            } else {
-                                newStatus = "Order Canceled";
-                            }
+        // Always listen to Firestore updates
+        const unsubscribe = onSnapshot(docRef, async (snap) => {
+            try {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    setOrderDetails(data);
 
-                            if (data.status !== newStatus) {
-                                await updateDoc(docRef, { status: newStatus });
-                                setStatus(newStatus);
-                            }
-                        } else {
-                            console.log("No such document!");
-                            setStatus("Waiting For Payment On Cashier");
-                        }
-                    } catch (err) {
-                        console.error(err);
-                        setStatus("Waiting For Payment On Cashier");
-                    } finally {
-                        setIsSaving(false);
+                    let newStatus;
+                    if (data.transaction_status === "settlement") {
+                        newStatus = "Preparing Food";
+                        updateStock();
+                        updateMenuSolds(data?.orderDetails);
+                    } else if (data.transaction_status === "pending") {
+                        newStatus = "Waiting For Payment On Cashier";
+                    } else {
+                        newStatus = "Order Canceled";
                     }
-                });
 
-                // cleanup listener when component unmounts
-                return () => unsubscribe();
+                    if (data.status !== newStatus) {
+                        await updateDoc(docRef, { status: newStatus });
+                        setStatus(newStatus);
+                    }
+                } else {
+                    console.log("No such document!");
+                    setStatus("Waiting For Payment On Cashier");
+                }
+            } catch (err) {
+                console.error(err);
+                setStatus("Waiting For Payment On Cashier");
+            } finally {
+                setIsSaving(false);
             }
+        });
 
-            const redirectCheck =
-                sessionStorage.getItem(`payment_${orderId}`) || transaction_status;
-            if (redirectCheck === "") {
-                removeSessionStorage(orderId);
-                navigate(`/menu?tableId=${tableId}`, { replace: true });
-            }
+        // Example redirect check
+        const redirectCheck =
+            sessionStorage.getItem(`payment_${orderId}`) || transaction_status;
+        if (redirectCheck === "") {
+            removeSessionStorage(orderId);
+            navigate(`/menu?tableId=${tableId}`, { replace: true });
+        }
 
-            // Send email via Formspree
-            //         await fetch("https://formspree.io/f/movlppyb", {
-            //             method: "POST",
-            //             headers: {
-            //                 "Content-Type": "application/json",
-            //                 Accept: "application/json",
-            //             },
-            //             body: JSON.stringify({
-            //                 _subject: `New Order - Order ID: ${txId}`,
-            //                 "Customer Name": fullName,
-            //                 "Order Time": orderTime,
-            //                 "Order ID": txId,
-            //                 "Table Number": tableId,
-            //                 "Order Details": formatOrder(selectedMenu),
-            //                 "Total": `Rp${total.toString()}`,
-            //                 "Notes": `This is an automated notification from Agro Resto.
-            // If you have any questions, please contact IT support.`
-            //             }),
-            //         });
-        };
-        run();
-    }, [navigate, orderId, location.state]);
+        // Send email via Formspree
+        //         await fetch("https://formspree.io/f/movlppyb", {
+        //             method: "POST",
+        //             headers: {
+        //                 "Content-Type": "application/json",
+        //                 Accept: "application/json",
+        //             },
+        //             body: JSON.stringify({
+        //                 _subject: `New Order - Order ID: ${txId}`,
+        //                 "Customer Name": fullName,
+        //                 "Order Time": orderTime,
+        //                 "Order ID": txId,
+        //                 "Table Number": tableId,
+        //                 "Order Details": formatOrder(selectedMenu),
+        //                 "Total": `Rp${total.toString()}`,
+        //                 "Notes": `This is an automated notification from Agro Resto.
+        // If you have any questions, please contact IT support.`
+        //             }),
+        //         });
 
+        // cleanup listener when component unmounts
+        return () => unsubscribe();
+
+    }, [orderId, location.state, paymentUrl, navigate, tableId]);
 
     const handlePayNow = () => {
         window.location.href = paymentUrl;
