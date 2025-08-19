@@ -38,7 +38,6 @@ export const ConfirmationPage = () => {
         orderId = searchParams.get("orderId");
     }
     const tableId = searchParams.get("tableId");
-    const transaction_status = searchParams.get("transaction_status");
     const paymentUrl = sessionStorage.getItem(`payment_${orderId}`);
 
     const [isSaving, setIsSaving] = useState(true);
@@ -73,8 +72,14 @@ export const ConfirmationPage = () => {
                 setStatus(stateData.status);
                 setOrderDetails(stateData);
 
-                // Update payment URL and solds safely
+                // Update payment URL safely
                 await updateDoc(docRef, { paymentUrl });
+
+                // Update stock if the order is already in "Preparing Food"
+                if (stateData.status === "Preparing Food") {
+                    await updateStock(stateData); // pass the order data to update stocks
+                }
+
                 await updateMenuSolds(stateData.orderDetails);
 
                 setIsSaving(false);
