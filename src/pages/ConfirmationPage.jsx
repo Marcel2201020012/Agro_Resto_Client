@@ -63,11 +63,11 @@ export const ConfirmationPage = () => {
     useEffect(() => {
         const docRef = doc(db, "transaction_id", orderId);
 
+        // If navigation provided state (fast initial UI)
         if (location.state) {
             const stateData = location.state;
-            console.log("State Data Exist -> normal operation");
+            console.log("State Data Exist -> bootstrap from navigation state");
 
-            // Initial set from navigation state
             setStatus(stateData.status);
             setOrderDetails(stateData);
 
@@ -78,11 +78,11 @@ export const ConfirmationPage = () => {
                 setIsSaving(false);
             })();
 
-            // Clear state so refresh uses Firestore only
-            navigate(location.pathname, { replace: true });
+            // ✅ Clear state (important: include search to preserve query params)
+            navigate(`${location.pathname}${location.search}`, { replace: true });
         }
 
-        // Firestore live updates
+        // Firestore real-time updates (always active)
         const unsubscribe = onSnapshot(docRef, async (snap) => {
             try {
                 if (snap.exists()) {
@@ -100,12 +100,11 @@ export const ConfirmationPage = () => {
                         newStatus = "Order Canceled";
                     }
 
-                    // ✅ Let Firestore override status
                     if (data.status !== newStatus) {
                         await updateDoc(docRef, { status: newStatus });
                         setStatus(newStatus);
                     } else {
-                        setStatus(data.status); // fallback in case status already correct
+                        setStatus(data.status);
                     }
                 } else {
                     console.log("No such document!");
@@ -140,12 +139,8 @@ export const ConfirmationPage = () => {
         //         });
 
         return () => unsubscribe();
-    }, [orderId, location.state, paymentUrl, navigate, tableId]);
 
-
-    const handlePayNow = () => {
-        window.location.href = paymentUrl;
-    }
+    }, [orderId, location, paymentUrl, navigate]);
 
     if (isSaving) {
         return (
