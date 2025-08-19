@@ -1,7 +1,7 @@
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase/firebaseConfig";
-import { doc, getDoc, updateDoc, increment, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
 
 function removeSessionStorage(txid) {
     sessionStorage.removeItem("fullName");
@@ -12,16 +12,17 @@ function removeSessionStorage(txid) {
 }
 
 async function updateMenuSolds(orderDetails) {
-    if (!Array.isArray(orderDetails)) return;
+  if (!Array.isArray(orderDetails)) return;
 
-    const updates = orderDetails.map(async (item) => {
-        const menuRef = doc(db, "menu_makanan", item.id);
-        await updateDoc(menuRef, {
-            solds: increment(item.jumlah),
-        });
+  const updates = orderDetails.map(async (item) => {
+    const menuRef = doc(db, "menu_makanan", item.id);
+    await updateDoc(menuRef, {
+      solds: increment(item.jumlah),
     });
+  });
 
-    await Promise.all(updates);
+  // Run all updates in parallel
+  await Promise.all(updates);
 }
 
 export const ConfirmationPage = () => {
@@ -60,7 +61,7 @@ export const ConfirmationPage = () => {
         await Promise.all(batchUpdates);
     };
 
-    useEffect(() => {
+     useEffect(() => {
         const docRef = doc(db, "transaction_id", orderId);
 
         // If navigation provided state (fast initial UI)
@@ -141,10 +142,14 @@ export const ConfirmationPage = () => {
 
     }, [orderId, location, paymentUrl, navigate]);
 
+    const handlePayNow = () => {
+        window.location.href = paymentUrl;
+    }
+
     if (isSaving) {
         return (
             <div className="container min-h-screen flex justify-center items-center">
-                <p className="text-lg font-semibold">Loading your order...</p>
+                <p className="text-lg font-semibold">Saving your order...</p>
             </div>
         )
     }
