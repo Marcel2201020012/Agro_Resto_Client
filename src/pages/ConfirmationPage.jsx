@@ -31,6 +31,7 @@ export const ConfirmationPage = () => {
     // const payment = location.state?.payment || "";
     const [status, setStatus] = useState("");
     const [orderDetails, setOrderDetails] = useState(null);
+    const jumlah_menu = sessionStorage.getItem("jumlah_menu");
 
     const [searchParams] = useSearchParams();
     let orderId = searchParams.get("order_id");
@@ -38,7 +39,6 @@ export const ConfirmationPage = () => {
         orderId = searchParams.get("orderId");
     }
     const tableId = searchParams.get("tableId");
-    const transaction_status = searchParams.get("transaction_status");
     const paymentUrl = sessionStorage.getItem(`payment_${orderId}`);
 
     const [isSaving, setIsSaving] = useState(true);
@@ -69,7 +69,7 @@ export const ConfirmationPage = () => {
         const docRef = doc(db, "transaction_id", orderId);
 
         // If navigation provided state (fast initial UI)
-        if (location.state) {
+        if (jumlah_menu !== "") {
             const stateData = location.state;
             console.log("State Data Exist -> bootstrap from navigation state");
 
