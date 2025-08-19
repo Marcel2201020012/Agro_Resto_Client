@@ -113,7 +113,7 @@ export const ConfirmationPage = () => {
                     await updateMenuSolds(data.orderDetails); // Only updates 'solds'
 
                     newStatus = "Preparing Food";
-                } else if (data.transaction_status === "pending" && status !== "Waiting For Payment On Cashier") {
+                } else if (data.transaction_status === "pending" || status !== "Waiting For Payment On Cashier") {
                     newStatus = "Waiting For Payment On Cashier";
                 }
 
