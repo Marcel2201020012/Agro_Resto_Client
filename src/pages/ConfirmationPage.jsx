@@ -63,11 +63,11 @@ export const ConfirmationPage = () => {
     useEffect(() => {
         const docRef = doc(db, "transaction_id", orderId);
 
-        // if state data is passed, do initial update
         if (location.state) {
             const stateData = location.state;
             console.log("State Data Exist -> normal operation");
 
+            // Initial set from navigation state
             setStatus(stateData.status);
             setOrderDetails(stateData);
 
@@ -77,9 +77,12 @@ export const ConfirmationPage = () => {
                 await updateMenuSolds(stateData.orderDetails);
                 setIsSaving(false);
             })();
+
+            // Clear state so refresh uses Firestore only
+            navigate(location.pathname, { replace: true });
         }
 
-        // Always listen to Firestore updates
+        // Firestore live updates
         const unsubscribe = onSnapshot(docRef, async (snap) => {
             try {
                 if (snap.exists()) {
@@ -93,11 +96,16 @@ export const ConfirmationPage = () => {
                         updateMenuSolds(data?.orderDetails);
                     } else if (data.transaction_status === "pending") {
                         newStatus = "Waiting For Payment On Cashier";
-                    } 
-                    
+                    } else {
+                        newStatus = "Order Canceled";
+                    }
+
+                    // ✅ Let Firestore override status
                     if (data.status !== newStatus) {
                         await updateDoc(docRef, { status: newStatus });
                         setStatus(newStatus);
+                    } else {
+                        setStatus(data.status); // fallback in case status already correct
                     }
                 } else {
                     console.log("No such document!");
@@ -110,14 +118,6 @@ export const ConfirmationPage = () => {
                 setIsSaving(false);
             }
         });
-
-        // Example redirect check
-        const redirectCheck =
-            sessionStorage.getItem(`payment_${orderId}`) || transaction_status;
-        if (redirectCheck === "") {
-            removeSessionStorage(orderId);
-            navigate(`/menu?tableId=${tableId}`, { replace: true });
-        }
 
         // Send email via Formspree
         //         await fetch("https://formspree.io/f/movlppyb", {
@@ -139,10 +139,9 @@ export const ConfirmationPage = () => {
         //             }),
         //         });
 
-        // cleanup listener when component unmounts
         return () => unsubscribe();
-
     }, [orderId, location.state, paymentUrl, navigate, tableId]);
+
 
     const handlePayNow = () => {
         window.location.href = paymentUrl;
