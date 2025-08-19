@@ -3,7 +3,7 @@ import MenuCard from "../components/MenuCard";
 import { useEffect, useState, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
-import { collection, getDocs } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 
 import { Navbar } from "../components/Navbar";
@@ -84,26 +84,29 @@ export const Menu = () => {
   const tableId = searchParams.get("tableId");
 
   useEffect(() => {
-    const fetchMenu = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "menu_makanan"));
-        let list = querySnapshot.docs.map(doc => ({
+    const unsub = onSnapshot(
+      collection(db, "menu_makanan"),
+      (querySnapshot) => {
+        let list = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         }));
 
-        list = list.map(item => ({
+        list = list.map((item) => ({
           ...item,
-          stocks: item.stocks - (jumlah[item.id] || 0)
+          stocks: item.stocks - (jumlah[item.id] || 0),
         }));
 
         setMenu(list);
-      } finally {
+        setIsLoaded(true);
+      },
+      (error) => {
+        console.error("Error fetching menu:", error);
         setIsLoaded(true);
       }
-    };
+    );
 
-    fetchMenu();
+    return () => unsub(); // cleanup when component unmounts
   }, [jumlah]);
 
   //Simpan menu yang sudah dipilih ke local storage agar dapat dipull kembali saat user ingin mengganti menu
