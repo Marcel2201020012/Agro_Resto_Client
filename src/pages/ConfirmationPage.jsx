@@ -30,7 +30,6 @@ export const ConfirmationPage = () => {
     const navigate = useNavigate();
     // const payment = location.state?.payment || "";
     const [status, setStatus] = useState("");
-    const transaction_status = searchParams.get("transaction_status");
     const [orderDetails, setOrderDetails] = useState(null);
 
     const [searchParams] = useSearchParams();
@@ -38,6 +37,7 @@ export const ConfirmationPage = () => {
     if (!orderId) {
         orderId = searchParams.get("orderId");
     }
+    const transaction_status = searchParams.get("transaction_status");
     const tableId = searchParams.get("tableId");
     const paymentUrl = sessionStorage.getItem(`payment_${orderId}`);
 
