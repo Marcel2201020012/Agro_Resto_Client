@@ -92,7 +92,7 @@ export const ConfirmationPage = () => {
                     let newStatus;
                     if (data.transaction_status === "settlement") {
                         newStatus = "Preparing Food";
-                        updateStock();
+                        updateStock(data);
                         updateMenuSolds(data?.orderDetails);
                     } else if (data.transaction_status === "pending") {
                         newStatus = "Waiting For Payment On Cashier";
