@@ -65,47 +65,63 @@ export const ConfirmationPage = () => {
     };
 
     useEffect(() => {
+        let isMounted = true; // track mounted state
         const docRef = doc(db, "transaction_id", orderId);
-
-        const stockUpdatedRef = useRef(false);
 
         const bootstrapFromNavigationState = async (stateData) => {
             try {
+                if (!isMounted) return; // don't update if unmounted
                 setStatus(stateData.status);
                 setOrderDetails(stateData);
 
                 await updateDoc(docRef, { paymentUrl });
-
-                if (stateData.status === "Preparing Food" && !stockUpdatedRef.current) {
+                if (stateData.status === "Preparing Food") {
                     await updateStock(stateData);
-                    stockUpdatedRef.current = true; // mark as updated
                 }
-
                 await updateMenuSolds(stateData.orderDetails);
 
-                setIsSaving(false);
+                if (isMounted) setIsSaving(false);
             } catch (err) {
                 console.error("Error bootstrapping state:", err);
-                setIsSaving(false);
+                if (isMounted) setIsSaving(false);
             }
         };
 
+        if (location.state) {
+            bootstrapFromNavigationState(location.state);
+            navigate(`${location.pathname}${location.search}`, { replace: true });
+        }
+
         const unsubscribe = onSnapshot(docRef, async (snap) => {
-            if (!snap.exists()) return;
+            if (!snap.exists() || !isMounted) return;
 
             const data = snap.data();
+            if (!isMounted) return;
             setOrderDetails(data);
 
             try {
-                if (data.transaction_status === "settlement" && data.status !== "Preparing Food" && !stockUpdatedRef.current) {
+                if (data.transaction_status === "settlement" && data.status !== "Preparing Food") {
                     await updateStock(data);
-                    stockUpdatedRef.current = true; // mark as updated
+                    await updateMenuSolds(data.orderDetails);
+                    if (isMounted) {
+                        await updateDoc(docRef, { status: "Preparing Food" });
+                        setStatus("Preparing Food");
+                    }
+                } else if (data.transaction_status === "pending" && data.status !== "Waiting For Payment On Cashier") {
+                    if (isMounted) {
+                        await updateDoc(docRef, { status: "Waiting For Payment On Cashier" });
+                        setStatus("Waiting For Payment On Cashier");
+                    }
+                } else {
+                    if (isMounted) setStatus(data.status);
                 }
             } catch (err) {
                 console.error(err);
+                if (isMounted) setStatus("Waiting For Payment On Cashier");
+            } finally {
+                if (isMounted) setIsSaving(false);
             }
         });
-
 
         // Send email via Formspree
         //         await fetch("https://formspree.io/f/movlppyb", {
@@ -127,8 +143,12 @@ export const ConfirmationPage = () => {
         //             }),
         //         });
 
-        return () => unsubscribe();
-    }, [orderId, location, paymentUrl, navigate, status]);
+        return () => {
+            isMounted = false;
+            unsubscribe();
+        };
+    }, [orderId, location, paymentUrl, navigate]);
+
 
 
     const handlePayNow = () => {
