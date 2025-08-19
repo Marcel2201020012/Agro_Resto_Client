@@ -92,16 +92,17 @@ export const ConfirmationPage = () => {
                     let newStatus;
                     if (data.transaction_status === "settlement") {
                         newStatus = "Preparing Food";
-                        updateStock(data);
+                        updateStock();
                         updateMenuSolds(data?.orderDetails);
                     } else if (data.transaction_status === "pending") {
                         newStatus = "Waiting For Payment On Cashier";
-                    } 
+                    }
 
-                    if (data.status !== newStatus) {
+                    if (newStatus !== undefined) {
                         await updateDoc(docRef, { status: newStatus });
                         setStatus(newStatus);
-                    } else {
+                    }
+                    else {
                         setStatus(data.status);
                     }
                 } else {
