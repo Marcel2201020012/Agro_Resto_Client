@@ -102,6 +102,7 @@ export const ConfirmationPage = () => {
 
             try {
                 if (data.transaction_status === "settlement" && data.status !== "Preparing Food") {
+                    console.log("run the first condition");
                     await updateStock(data);
                     await updateMenuSolds(data.orderDetails);
                     if (isMounted) {
@@ -109,11 +110,13 @@ export const ConfirmationPage = () => {
                         setStatus("Preparing Food");
                     }
                 } else if (data.transaction_status === "pending" && data.status !== "Waiting For Payment On Cashier") {
+                    console.log("run the second condition");
                     if (isMounted) {
                         await updateDoc(docRef, { status: "Waiting For Payment On Cashier" });
                         setStatus("Waiting For Payment On Cashier");
                     }
                 } else {
+                    console.log("run the third condition");
                     if (isMounted) setStatus(data.status);
                 }
             } catch (err) {
