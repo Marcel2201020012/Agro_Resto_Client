@@ -102,7 +102,7 @@ export const ConfirmationPage = () => {
             setOrderDetails(data);
 
             try {
-                if (transaction_status === "settlement" && data.status !== "Preparing Food") {
+                if (transaction_status === "settlement" && data.status !== "Preparing Food" && data.status !== "Order Finished" && data.status !== "Order Canceled") {
                     console.log("run the first condition");
                     await updateStock(data);
                     await updateMenuSolds(data.orderDetails);
