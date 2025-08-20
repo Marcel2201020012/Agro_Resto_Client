@@ -187,21 +187,21 @@ export const CheckoutPage = () => {
                 onClose: async () => {
                     setIsProcessing(false);
                     console.log("Payment popup closed");
-                    const orderData = {
-                        customerName: fullName,
-                        orderDetails: selectedMenu,
-                        notes,
-                        total,
-                        tableId,
-                        status: "Waiting For Payment On Cashier",
-                        createdAt: serverTimestamp(),
-                    };
-
-                    //sessionStorage.setItem("isSubmit", 1);
-                    await setDoc(doc(db, "transaction_id", transaction_id), orderData);
 
                     const paymentUrl = sessionStorage.getItem(`payment_${transaction_id}`);
                     if (paymentUrl && window.confirm("Payment Closed Unexpectedly. Want to continue payment?")) {
+                        const orderData = {
+                            customerName: fullName,
+                            orderDetails: selectedMenu,
+                            notes,
+                            total,
+                            tableId,
+                            status: "Waiting For Payment On Cashier",
+                            createdAt: serverTimestamp(),
+                        };
+
+                        //sessionStorage.setItem("isSubmit", 1);
+                        await setDoc(doc(db, "transaction_id", transaction_id), orderData);
                         window.location.href = paymentUrl;
                     }
                 }
