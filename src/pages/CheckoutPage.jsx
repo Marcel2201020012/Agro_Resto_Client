@@ -203,6 +203,8 @@ export const CheckoutPage = () => {
                         await setDoc(doc(db, "transaction_id", transaction_id), orderData);
                         setIsProcessing(false);
                         window.location.href = paymentUrl;
+                    } else{
+                        setIsProcessing(false);
                     }
                 }
             });
