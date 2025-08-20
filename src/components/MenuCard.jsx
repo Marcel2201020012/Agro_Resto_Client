@@ -1,11 +1,18 @@
 import { useState } from 'react';
 import { Minus, Plus, X } from 'lucide-react';
 
-const MenuCard = ({ id, name, cn, desc, price, stocks, image, jumlah, tambah, kurang }) => {
+const MenuCard = ({ id, name, cn, desc, price, promotion, stocks, image, jumlah, tambah, kurang }) => {
   const [openPopUp, setOpenPopUp] = useState(false);
 
   return (
+
     <div className="relative bg-white rounded-xl shadow-lg p-4">
+      {stocks <= 0 &&
+        <div className="flex flex-col items-center justify-center absolute inset-0 bg-gray-500/20 backdrop-blur-sm rounded-xl">
+          <span className="text-3xl font-bold text-red-500 drop-shadow-lg">Empty</span>
+        </div>
+
+      }
       <div className="lg:flex">
         <img
           onClick={() => setOpenPopUp(true)}
@@ -14,21 +21,37 @@ const MenuCard = ({ id, name, cn, desc, price, stocks, image, jumlah, tambah, ku
           className="h-32 lg:h-64 object-cover rounded-md"
         />
 
-        {/* nama menu + price */}
+        {/* nama menu + price + promotion*/}
         <div className="text-left">
           <h3 className="text-black text-sm font-medium">{name}</h3>
           <h3 className="text-black text-sm font-medium">{cn}</h3>
-          <p className="text-agro-color text-sm font-semibold">
-            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)}
-          </p>
+
+          <div className="flex gap-2 items-center">
+            <p className={`font-semibold ${promotion > 0 ? "line-through text-red-500 text-xs" : "text-agro-color text-sm"}`}>
+              {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)}
+            </p>
+            {promotion > 0 &&
+              <div className="bg-red-100 rounded-sm p-1">
+                <span className="font-semibold text-xs text-red-500">
+                  -{Math.round(((price - promotion) / price) * 100)}%
+                </span>
+              </div>
+            }
+          </div>
+
+          {promotion > 0 &&
+            <p className={"text-agro-color text-sm font-semibold"}>
+              {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(promotion)}
+            </p>
+          }
         </div>
       </div>
 
-      <div className='text-left'>
+      {/* <div className='text-left'>
         <h3 className='text-sm font-medium'>
           {stocks < 1 ? <div>Stocks: <span className='text-red-500'>Empty</span></div> : <div>Stocks: <span className='text-agro-color'>{stocks}</span></div>}
         </h3>
-      </div>
+      </div> */}
 
       <br />
 

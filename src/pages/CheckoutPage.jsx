@@ -18,7 +18,10 @@ export const CheckoutPage = () => {
     const [searchParams] = useSearchParams();
 
     const selectedMenu = location.state?.selectedMenu || [];
-    const total = selectedMenu.reduce((acc, item) => acc + item.price * item.jumlah, 0);
+    const total = selectedMenu.reduce((acc, item) => {
+        const effectivePrice = item.promotion && item.promotion > 0 ? item.promotion : item.price;
+        return acc + effectivePrice * item.jumlah;
+    }, 0);
     const tableId = searchParams.get("tableId");
     const transaction_id = generateTransactionId(tableId);
 
@@ -203,7 +206,7 @@ export const CheckoutPage = () => {
                         await setDoc(doc(db, "transaction_id", transaction_id), orderData);
                         setIsProcessing(false);
                         window.location.href = paymentUrl;
-                    } else{
+                    } else {
                         setIsProcessing(false);
                     }
                 }
@@ -242,6 +245,7 @@ export const CheckoutPage = () => {
                             name={item.name}
                             jumlah={item.jumlah}
                             price={item.price}
+                            promotion={item.promotion}
                         />
                     ))}
                 </div>

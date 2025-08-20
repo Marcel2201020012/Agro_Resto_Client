@@ -25,6 +25,7 @@ function MenuCategory({ category, title, MenuData, jumlah, tambah, kurang }) {
             name={item.name}
             cn={item.cn}
             price={item.price}
+            promotion={item.promotion}
             stocks={item.stocks}
             image={item.image}
             jumlah={jumlah[item.id] || 0}
@@ -39,7 +40,11 @@ function MenuCategory({ category, title, MenuData, jumlah, tambah, kurang }) {
 
 function RecomendationCategory({ title, MenuData, jumlah, tambah, kurang }) {
   const topItems = MenuData
-    .map(item => ({ ...item, solds: item.solds ?? 0 }))
+    .filter(item => (item.stocks ?? 0) > 0)
+    .map(item => ({
+      ...item,
+      solds: item.solds ?? 0
+    }))
     .slice()
     .sort((a, b) => {
       if (b.solds !== a.solds) {
@@ -61,6 +66,7 @@ function RecomendationCategory({ title, MenuData, jumlah, tambah, kurang }) {
             cn={item.cn}
             desc={item.desc}
             price={item.price}
+            promotion={item.promotion}
             stocks={item.stocks}
             image={item.image}
             jumlah={jumlah[item.id] || 0}
