@@ -36,7 +36,7 @@ export default async function handler(req, res) {
     };
 
     const transaction = await snap.createTransaction(parameter);
-    res.status(200).json({ redirect_url: transaction.redirect_url });
+    res.status(200).json({ token: transaction.token, redirect_url: transaction.redirect_url });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
