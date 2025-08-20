@@ -185,7 +185,6 @@ export const CheckoutPage = () => {
                 },
 
                 onClose: async () => {
-                    setIsProcessing(false);
                     console.log("Payment popup closed");
 
                     const paymentUrl = sessionStorage.getItem(`payment_${transaction_id}`);
@@ -202,6 +201,7 @@ export const CheckoutPage = () => {
 
                         //sessionStorage.setItem("isSubmit", 1);
                         await setDoc(doc(db, "transaction_id", transaction_id), orderData);
+                        setIsProcessing(false);
                         window.location.href = paymentUrl;
                     }
                 }
