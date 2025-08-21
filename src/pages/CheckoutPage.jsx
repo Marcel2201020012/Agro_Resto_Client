@@ -102,12 +102,18 @@ export const CheckoutPage = () => {
         setIsProcessing(true);
 
         try {
-            const foodItems = selectedMenu.map(item => ({
-                id: item.id,
-                name: item.name,
-                price: item.price,
-                jumlah: item.jumlah
-            }));
+            const foodItems = selectedMenu.map(item => {
+                const effectivePrice = item.promotion && item.promotion > 0
+                    ? item.promotion
+                    : item.price;
+
+                return {
+                    id: item.id,
+                    name: item.name,
+                    price: effectivePrice,
+                    jumlah: item.jumlah
+                };
+            });
 
             const res = await fetch("/api/createTransaction", {
                 method: "POST",
