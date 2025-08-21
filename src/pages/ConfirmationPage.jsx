@@ -229,9 +229,15 @@ export const ConfirmationPage = () => {
                                 <span>{item.jumlah}x</span>{' '}
                                 <span>{item.name}</span>
                             </div>
-                            <div className="text-right font-semibold">
-                                {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.price)}
-                            </div>
+                            {item.promotion > 0 ?
+                                <div className="text-right font-semibold">
+                                    {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.price)}
+                                </div>
+                                :
+                                <div className="text-right font-semibold">
+                                    {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.promotion)}
+                                </div>
+                            }
                         </div>
                     ))}
                 </div>
