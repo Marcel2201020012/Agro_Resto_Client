@@ -9,9 +9,8 @@ const MenuCard = ({ id, name, cn, desc, price, promotion, stocks, image, jumlah,
     <div className="relative bg-white rounded-xl shadow-lg p-4">
       {stocks <= 0 &&
         <div className="flex flex-col items-center justify-center absolute inset-0 bg-gray-500/20 backdrop-blur-sm rounded-xl">
-          <span className="text-3xl font-bold text-red-500 drop-shadow-lg">Empty</span>
+          <span className="text-3xl font-bold text-red-500/85 drop-shadow-lg">Empty</span>
         </div>
-
       }
       <div className="lg:flex">
         <img
