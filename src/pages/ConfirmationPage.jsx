@@ -109,7 +109,7 @@ export const ConfirmationPage = () => {
                     await updateStock(data);
                     await updateMenuSolds(data.orderDetails);
                     if (isMounted) {
-                        // await updateDoc(docRef, { status: "Preparing Food" });
+                        await updateDoc(docRef, { status: "Preparing Food" });
                         setStatus("Preparing Food");
                     }
                 // } else if (transaction_status === "pending" && data.status !== "Waiting For Payment On Cashier") {
