@@ -81,6 +81,7 @@ export const CheckoutPage = () => {
             setPaymentError("Please choose a payment methode.");
             return false;
         }
+        sessionStorage.setItem("payment", JSON.stringify(payment));
         setPaymentError("");
         return true;
     }
