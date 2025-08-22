@@ -145,7 +145,7 @@ export const CheckoutPage = () => {
         //     headers: { "Content-Type": "application/json" },
         //     body: JSON.stringify({
         //         order: transaction_id,
-        //         amount: total,
+        //         amount: total + 2 * total * 0.1,
         //         name: fullName,
         //         items: foodItems,
         //         tableId: tableId,
@@ -281,7 +281,10 @@ export const CheckoutPage = () => {
                     ))}
                 </div>
                 <div className="flex justify-between mt-4 border-t pt-2">
-                    <p className="font-semibold">Total Order</p>
+                    <div className='text-left'>
+                        <p className='font-semibold'>Total Order</p>
+                        <p className='text-xs italic'>*Before Tax</p>
+                    </div>
                     <p className="text-green-700 font-semibold">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total)}</p>
                 </div>
             </div>

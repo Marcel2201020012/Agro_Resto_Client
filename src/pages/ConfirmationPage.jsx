@@ -242,11 +242,27 @@ export const ConfirmationPage = () => {
                             }
                         </div>
                     ))}
+                     <div className="flex justify-between items-center">
+                            <span className="font-bold">Service 10%</span>
+                            <span className="font-bold">{new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0
+                            }).format(Number(orderDetails.total * 0.1))}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                            <span className="font-bold">Tax 10%</span>
+                            <span className="font-bold">{new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0
+                            }).format(Number(orderDetails.total * 0.1))}</span>
+                    </div>
                 </div>
 
                 <div className="flex justify-between mt-4 border-t pt-2">
-                    <p className="font-semibold">Total</p>
-                    <p className="text-green-700 font-semibold">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(orderDetails.total)}</p>
+                    <p className="font-bold">Total</p>
+                    <p className="text-green-700 font-bold">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(orderDetails.total + 2 * orderDetails.total * 0.1)}</p>
                 </div>
             </div>
 
