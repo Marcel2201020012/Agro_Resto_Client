@@ -88,7 +88,7 @@ export const CheckoutPage = () => {
     const handlePayNow = (e) => {
         e.preventDefault();
         handleEmptyNote();
-        if (!validateFullName()) return;
+        if (!validateFullName() || !validatePaymentMethode()) return;
         setShowModal(true);
     };
 
