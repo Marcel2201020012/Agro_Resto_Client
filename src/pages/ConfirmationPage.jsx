@@ -28,7 +28,7 @@ async function updateMenuSolds(orderDetails) {
 export const ConfirmationPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const payment = location.state?.payment || "";
+
     const [status, setStatus] = useState("");
     const [orderDetails, setOrderDetails] = useState(null);
 
@@ -100,24 +100,25 @@ export const ConfirmationPage = () => {
             const data = snap.data();
             if (!isMounted) return;
             setOrderDetails(data);
+            setStatus(data.status);
 
             try {
                 // if (transaction_status === "settlement" && data.status !== "Preparing Food" && data.status !== "Order Finished" && data.status !== "Order Canceled") {
-                if (data.status === "Waiting For Payment on Cashier" ) {
+                if (data.status === "Confirmed") {
                     console.log("run the first condition");
                     await updateStock(data);
                     await updateMenuSolds(data.orderDetails);
                     if (isMounted) {
-                        await updateDoc(docRef, { status: "Preparing Food" });
+                        // await updateDoc(docRef, { status: "Preparing Food" });
                         setStatus("Preparing Food");
                     }
                 // } else if (transaction_status === "pending" && data.status !== "Waiting For Payment On Cashier") {
-                } else if (data.status !== "Waiting For Payment On Cashier") {
-                    console.log("run the second condition");
-                    if (isMounted) {
-                        await updateDoc(docRef, { status: "Waiting For Payment On Cashier" });
-                        setStatus("Waiting For Payment On Cashier");
-                    }
+                // } else if (data.status !== "Waiting For Payment On Cashier") {
+                //     console.log("run the second condition");
+                //     if (isMounted) {
+                //         await updateDoc(docRef, { status: "Waiting For Payment On Cashier" });
+                //         setStatus("Waiting For Payment On Cashier");
+                //     }
                 } else {
                     console.log("run the third condition");
                     if (isMounted) setStatus(data.status);
@@ -131,7 +132,7 @@ export const ConfirmationPage = () => {
         });
 
         // const redirectCheck = sessionStorage.getItem(`payment_${orderId}`) || transaction_status;
-        const redirectCheck = transaction_status;
+        const redirectCheck = location.state?.payment;
         if (redirectCheck === "") {
             removeSessionStorage(orderId);
             navigate(`/menu?tableId=${tableId}`, { replace: true });
@@ -206,7 +207,7 @@ export const ConfirmationPage = () => {
 
                     <div>
                         <div className="font-bold">Payment Methode</div>
-                        <div>{payment}</div>
+                        <div>{orderDetails.payment}</div>
                     </div>
 
                     <div>

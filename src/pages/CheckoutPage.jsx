@@ -93,6 +93,12 @@ export const CheckoutPage = () => {
     };
 
     const handleConfirm = async () => {
+        if (tableId === 'null') {
+            alert("Table ID can't be null value")
+            return;
+        }
+
+
         console.log(`order type: ${selectedOrderType}`)
         Object.keys(sessionStorage)
             .filter(key => key.startsWith('payment_'))
@@ -106,16 +112,17 @@ export const CheckoutPage = () => {
             customerName: fullName,
             orderDetails: selectedMenu,
             notes: customerNote,
+            payment: payment,
             total,
             tableId,
-            status: "Waiting For Payment on Cashier",
+            status: "Waiting For Payment On Cashier",
             createdAt: serverTimestamp(),
         };
 
         await setDoc(doc(db, "transaction_id", transaction_id), orderData);
         setIsProcessing(false);
 
-        navigate(`confirm?orderId=${transaction_id}&tableId=${tableId}`, {
+        navigate(`/confirm?orderId=${transaction_id}&tableId=${tableId}`, {
             replace: true,
             state: orderData
         });
