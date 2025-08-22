@@ -79,7 +79,7 @@ export const ConfirmationPage = () => {
                 if (stateData.status === "Preparing Food") {
                     await updateStock(stateData);
                 }
-                await updateMenuSolds(stateData.orderDetails);
+                // await updateMenuSolds(stateData.orderDetails);
 
                 if (isMounted) setIsSaving(false);
             } catch (err) {
