@@ -29,9 +29,9 @@ export default async function handler(req, res) {
       },
       item_details: item_details,
       callbacks: {
-        finish: `https://agro-resto-client.vercel.app/confirm?&tableId=${tableId}`,
-        unfinish: `https://agro-resto-client.vercel.app/confirm?&tableId=${tableId}`,
-        error: `https://agro-resto-client.vercel.app/confirm?&tableId=${tableId}`,
+        finish: `https://client.fbagrohotel.com/confirm?&tableId=${tableId}`,
+        unfinish: `https://client.fbagrohotel.com/confirm?&tableId=${tableId}`,
+        error: `https://client.fbagrohotel.com/confirm?&tableId=${tableId}`,
       }
     };
 
