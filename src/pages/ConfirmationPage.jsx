@@ -8,7 +8,7 @@ function removeSessionStorage(txid) {
     sessionStorage.removeItem("payment");
     sessionStorage.removeItem("jumlah_menu");
     // sessionStorage.removeItem("isSubmit");
-    sessionStorage.removeItem(`payment_${txid}`);
+    // sessionStorage.removeItem(`payment_${txid}`);
 }
 
 async function updateMenuSolds(orderDetails) {
@@ -28,7 +28,7 @@ async function updateMenuSolds(orderDetails) {
 export const ConfirmationPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    // const payment = location.state?.payment || "";
+    const payment = location.state?.payment || "";
     const [status, setStatus] = useState("");
     const [orderDetails, setOrderDetails] = useState(null);
 
@@ -37,9 +37,9 @@ export const ConfirmationPage = () => {
     if (!orderId) {
         orderId = searchParams.get("orderId");
     }
-    const transaction_status = searchParams.get("transaction_status");
+    // const transaction_status = searchParams.get("transaction_status");
     const tableId = searchParams.get("tableId");
-    const paymentUrl = sessionStorage.getItem(`payment_${orderId}`);
+    // const paymentUrl = sessionStorage.getItem(`payment_${orderId}`);
 
     const [isSaving, setIsSaving] = useState(true);
 
@@ -75,7 +75,7 @@ export const ConfirmationPage = () => {
                 setStatus(stateData.status);
                 setOrderDetails(stateData);
 
-                await updateDoc(docRef, { paymentUrl });
+                // await updateDoc(docRef, { paymentUrl });
                 if (stateData.status === "Preparing Food") {
                     await updateStock(stateData);
                 }
@@ -102,7 +102,8 @@ export const ConfirmationPage = () => {
             setOrderDetails(data);
 
             try {
-                if (transaction_status === "settlement" && data.status !== "Preparing Food" && data.status !== "Order Finished" && data.status !== "Order Canceled") {
+                // if (transaction_status === "settlement" && data.status !== "Preparing Food" && data.status !== "Order Finished" && data.status !== "Order Canceled") {
+                if (data.status === "Waiting For Payment on Cashier" ) {
                     console.log("run the first condition");
                     await updateStock(data);
                     await updateMenuSolds(data.orderDetails);
@@ -110,7 +111,8 @@ export const ConfirmationPage = () => {
                         await updateDoc(docRef, { status: "Preparing Food" });
                         setStatus("Preparing Food");
                     }
-                } else if (transaction_status === "pending" && data.status !== "Waiting For Payment On Cashier") {
+                // } else if (transaction_status === "pending" && data.status !== "Waiting For Payment On Cashier") {
+                } else if (data.status !== "Waiting For Payment On Cashier") {
                     console.log("run the second condition");
                     if (isMounted) {
                         await updateDoc(docRef, { status: "Waiting For Payment On Cashier" });
@@ -128,8 +130,8 @@ export const ConfirmationPage = () => {
             }
         });
 
-        const redirectCheck =
-            sessionStorage.getItem(`payment_${orderId}`) || transaction_status;
+        // const redirectCheck = sessionStorage.getItem(`payment_${orderId}`) || transaction_status;
+        const redirectCheck = transaction_status;
         if (redirectCheck === "") {
             removeSessionStorage(orderId);
             navigate(`/menu?tableId=${tableId}`, { replace: true });
@@ -159,13 +161,12 @@ export const ConfirmationPage = () => {
             isMounted = false;
             unsubscribe();
         };
-    }, [orderId, location, paymentUrl, navigate]);
+    // }, [orderId, location, paymentUrl, navigate]);
+    }, [orderId, location, navigate]);
 
-
-
-    const handlePayNow = () => {
-        window.location.href = paymentUrl;
-    }
+    // const handlePayNow = () => {
+    //     window.location.href = paymentUrl;
+    // }
 
     if (isSaving) {
         return (
@@ -203,10 +204,10 @@ export const ConfirmationPage = () => {
                         <div>{tableId}</div>
                     </div>
 
-                    {/* <div>
+                    <div>
                         <div className="font-bold">Payment Methode</div>
                         <div>{payment}</div>
-                    </div> */}
+                    </div>
 
                     <div>
                         <div className="font-bold">Notes</div>
@@ -253,11 +254,11 @@ export const ConfirmationPage = () => {
                     <span>Back</span>
                 </button>
 
-                {status === "Waiting For Payment On Cashier" &&
+                {/* {status === "Waiting For Payment On Cashier" &&
                     <button onClick={handlePayNow} className="bg-agro-color rounded-full text-white px-6 py-2">
                         <span>Pay Now</span>
                     </button>
-                }
+                } */}
             </div>
 
         </div>

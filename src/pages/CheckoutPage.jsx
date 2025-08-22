@@ -37,8 +37,8 @@ export const CheckoutPage = () => {
 
     const [isSaving, setIsSaving] = useState(false);
 
-    // const [payment, setPayment] = useState("");
-    // const [paymentError, setPaymentError] = useState("");
+    const [payment, setPayment] = useState("");
+    const [paymentError, setPaymentError] = useState("");
 
     useEffect(() => {
         const userName = sessionStorage.getItem("fullName");
@@ -46,10 +46,10 @@ export const CheckoutPage = () => {
             setFullName(JSON.parse(userName));
         }
 
-        // const payment = sessionStorage.getItem("payment");
-        // if (payment) {
-        //     setPayment(JSON.parse(payment));
-        // }
+        const payment = sessionStorage.getItem("payment");
+        if (payment) {
+            setPayment(JSON.parse(payment));
+        }
     }, []);
 
     useEffect(() => {
@@ -58,7 +58,7 @@ export const CheckoutPage = () => {
             return;
         }
         sessionStorage.setItem("fullName", JSON.stringify(fullName));
-        // sessionStorage.setItem("payment", JSON.stringify(payment));
+        sessionStorage.setItem("payment", JSON.stringify(payment));
     }, [fullName]);
 
     const validateFullName = () => {
@@ -76,14 +76,14 @@ export const CheckoutPage = () => {
         }
     };
 
-    // const validatePaymentMethode = () => {
-    //     if (payment === "") {
-    //         setPaymentError("Please choose a payment methode.");
-    //         return false;
-    //     }
-    //     setPaymentError("");
-    //     return true;
-    // }
+    const validatePaymentMethode = () => {
+        if (payment === "") {
+            setPaymentError("Please choose a payment methode.");
+            return false;
+        }
+        setPaymentError("");
+        return true;
+    }
 
     const handlePayNow = (e) => {
         e.preventDefault();
@@ -101,127 +101,146 @@ export const CheckoutPage = () => {
         setShowModal(false);
         setIsProcessing(true);
 
-        try {
-            const foodItems = selectedMenu.map(item => {
-                const effectivePrice = item.promotion && item.promotion > 0
-                    ? item.promotion
-                    : item.price;
+        const orderData = {
+            orderType: selectedOrderType,
+            customerName: fullName,
+            orderDetails: selectedMenu,
+            notes: customerNote,
+            total,
+            tableId,
+            status: "Waiting For Payment on Cashier",
+            createdAt: serverTimestamp(),
+        };
 
-                return {
-                    id: item.id,
-                    name: item.name,
-                    price: effectivePrice,
-                    jumlah: item.jumlah
-                };
-            });
+        await setDoc(doc(db, "transaction_id", transaction_id), orderData);
+        setIsProcessing(false);
 
-            const res = await fetch("/api/createTransaction", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    order: transaction_id,
-                    amount: total,
-                    name: fullName,
-                    items: foodItems,
-                    tableId: tableId,
-                }),
-            });
+        navigate(`confirm?orderId=${transaction_id}&tableId=${tableId}`, {
+            replace: true,
+            state: orderData
+        });
 
-            const data = await res.json();
+        // try {
+        //     const foodItems = selectedMenu.map(item => {
+        //         const effectivePrice = item.promotion && item.promotion > 0
+        //             ? item.promotion
+        //             : item.price;
 
-            if (!data.token) {
-                setIsProcessing(false);
-                throw new Error("Failed to get Midtrans token");
-            }
+        //         return {
+        //             id: item.id,
+        //             name: item.name,
+        //             price: effectivePrice,
+        //             jumlah: item.jumlah
+        //         };
+        //     });
 
-            sessionStorage.setItem(`payment_${transaction_id}`, data.redirect_url);
+        // const res = await fetch("/api/createTransaction", {
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({
+        //         order: transaction_id,
+        //         amount: total,
+        //         name: fullName,
+        //         items: foodItems,
+        //         tableId: tableId,
+        //     }),
+        // });
 
-            window.snap.pay(data.token, {
-                onSuccess: async (result) => {
-                    setIsProcessing(false);
-                    console.log("Payment Success:", result);
+        // const data = await res.json();
 
-                    const orderData = {
-                        orderType: selectedOrderType,
-                        customerName: fullName,
-                        orderDetails: selectedMenu,
-                        notes: customerNote,
-                        total,
-                        tableId,
-                        status: "Preparing Food",
-                        createdAt: serverTimestamp(),
-                    };
+        // if (!data.token) {
+        //     setIsProcessing(false);
+        //     throw new Error("Failed to get Midtrans token");
+        // }
 
-                    //sessionStorage.setItem("isSubmit", 1);
-                    setIsSaving(true);
-                    await setDoc(doc(db, "transaction_id", transaction_id), orderData);
+        // sessionStorage.setItem(`payment_${transaction_id}`, data.redirect_url);
 
-                    navigate(`/confirm?orderId=${transaction_id}&tableId=${tableId}`, {
-                        replace: true,
-                        state: orderData
-                    });
-                },
+        //     window.snap.pay(data.token, {
+        //         onSuccess: async (result) => {
+        //             setIsProcessing(false);
+        //             console.log("Payment Success:", result);
 
-                onPending: async (result) => {
-                    setIsProcessing(false);
-                    console.log("Payment Pending:", result);
+        //             const orderData = {
+        //                 orderType: selectedOrderType,
+        //                 customerName: fullName,
+        //                 orderDetails: selectedMenu,
+        //                 notes: customerNote,
+        //                 total,
+        //                 tableId,
+        //                 status: "Preparing Food",
+        //                 createdAt: serverTimestamp(),
+        //             };
 
-                    const orderData = {
-                        orderType: selectedOrderType,
-                        customerName: fullName,
-                        orderDetails: selectedMenu,
-                        notes: customerNote,
-                        total,
-                        tableId,
-                        status: "Waiting For Payment On Cashier",
-                        createdAt: serverTimestamp(),
-                    };
+        //             //sessionStorage.setItem("isSubmit", 1);
+        //             setIsSaving(true);
+        //             await setDoc(doc(db, "transaction_id", transaction_id), orderData);
 
-                    //sessionStorage.setItem("isSubmit", 1);
-                    setIsSaving(true);
-                    await setDoc(doc(db, "transaction_id", transaction_id), orderData);
+        //             navigate(`/confirm?orderId=${transaction_id}&tableId=${tableId}`, {
+        //                 replace: true,
+        //                 state: orderData
+        //             });
+        //         },
 
-                    navigate(`/confirm?orderId=${transaction_id}&tableId=${tableId}`, {
-                        replace: true,
-                        state: orderData
-                    });
-                },
+        //         onPending: async (result) => {
+        //             setIsProcessing(false);
+        //             console.log("Payment Pending:", result);
 
-                onError: (result) => {
-                    setIsProcessing(false);
-                    console.error("Payment Error:", result);
-                    alert("Payment failed, please try again.");
-                },
+        //             const orderData = {
+        //                 orderType: selectedOrderType,
+        //                 customerName: fullName,
+        //                 orderDetails: selectedMenu,
+        //                 notes: customerNote,
+        //                 total,
+        //                 tableId,
+        //                 status: "Waiting For Payment On Cashier",
+        //                 createdAt: serverTimestamp(),
+        //             };
 
-                onClose: async () => {
-                    console.log("Payment popup closed");
+        //             //sessionStorage.setItem("isSubmit", 1);
+        //             setIsSaving(true);
+        //             await setDoc(doc(db, "transaction_id", transaction_id), orderData);
 
-                    const paymentUrl = sessionStorage.getItem(`payment_${transaction_id}`);
-                    if (paymentUrl && window.confirm("Payment Closed Unexpectedly. Want to continue payment?")) {
-                        const orderData = {
-                            customerName: fullName,
-                            orderDetails: selectedMenu,
-                            notes: customerNote,
-                            total,
-                            tableId,
-                            status: "Waiting For Payment On Cashier",
-                            createdAt: serverTimestamp(),
-                        };
+        //             navigate(`/confirm?orderId=${transaction_id}&tableId=${tableId}`, {
+        //                 replace: true,
+        //                 state: orderData
+        //             });
+        //         },
 
-                        //sessionStorage.setItem("isSubmit", 1);
-                        await setDoc(doc(db, "transaction_id", transaction_id), orderData);
-                        setIsProcessing(false);
-                        window.location.href = paymentUrl;
-                    } else {
-                        setIsProcessing(false);
-                    }
-                }
-            });
+        //         onError: (result) => {
+        //             setIsProcessing(false);
+        //             console.error("Payment Error:", result);
+        //             alert("Payment failed, please try again.");
+        //         },
 
-        } catch (err) {
-            console.error(err);
-            alert("Payment Error");
-        }
+        //         onClose: async () => {
+        //             console.log("Payment popup closed");
+
+        //             const paymentUrl = sessionStorage.getItem(`payment_${transaction_id}`);
+        //             if (paymentUrl && window.confirm("Payment Closed Unexpectedly. Want to continue payment?")) {
+        //                 const orderData = {
+        //                     customerName: fullName,
+        //                     orderDetails: selectedMenu,
+        //                     notes: customerNote,
+        //                     total,
+        //                     tableId,
+        //                     status: "Waiting For Payment On Cashier",
+        //                     createdAt: serverTimestamp(),
+        //                 };
+
+        //                 //sessionStorage.setItem("isSubmit", 1);
+        //                 await setDoc(doc(db, "transaction_id", transaction_id), orderData);
+        //                 setIsProcessing(false);
+        //                 window.location.href = paymentUrl;
+        //             } else {
+        //                 setIsProcessing(false);
+        //             }
+        //         }
+        //     });
+
+        // } catch (err) {
+        //     console.error(err);
+        //     alert("Payment Error");
+        // }
     };
 
     const handleCancel = () => {
@@ -306,7 +325,7 @@ export const CheckoutPage = () => {
                     />
                 </div>
 
-                {/* <div>
+                <div>
                     <label htmlFor="payment" className="block mb-2 font-medium text-left">
                         Payment Method
                     </label>
@@ -326,7 +345,7 @@ export const CheckoutPage = () => {
                     {paymentError && (
                         <p className="text-red-500 mt-1 text-sm">{paymentError}</p>
                     )}
-                </div> */}
+                </div>
 
                 <div>
                     <label className="text-left block font-semibold mb-1">Table ID</label>
