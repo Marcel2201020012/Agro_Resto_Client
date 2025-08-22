@@ -98,7 +98,6 @@ export const CheckoutPage = () => {
             return;
         }
 
-
         console.log(`order type: ${selectedOrderType}`)
         Object.keys(sessionStorage)
             .filter(key => key.startsWith('payment_'))

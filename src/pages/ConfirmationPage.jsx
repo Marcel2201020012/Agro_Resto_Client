@@ -132,7 +132,7 @@ export const ConfirmationPage = () => {
         });
 
         // const redirectCheck = sessionStorage.getItem(`payment_${orderId}`) || transaction_status;
-        const redirectCheck = location.state?.payment;
+        const redirectCheck = location.state?.createdAt;
         if (redirectCheck === "") {
             removeSessionStorage(orderId);
             navigate(`/menu?tableId=${tableId}`, { replace: true });
