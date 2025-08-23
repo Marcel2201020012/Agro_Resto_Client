@@ -2,6 +2,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { db } from "../../firebase/firebaseConfig";
 import { doc, onSnapshot, updateDoc, increment } from "firebase/firestore";
+import { PaymentInstruction } from "../components/PaymentInstruction";
 
 function removeSessionStorage(txid) {
     sessionStorage.removeItem("fullName");
@@ -179,6 +180,7 @@ export const ConfirmationPage = () => {
 
     return (
         <div className="container min-h-screen overflow-x-hidden pt-8 pb-16">
+            <PaymentInstruction/>
             <h1 className="text-left text-sm text-agro-color font-semibold mb-1">CONFRIMATION</h1>
             <h2 className="text-left text-2xl font-bold mb-4">ORDER DETAIL</h2>
 
