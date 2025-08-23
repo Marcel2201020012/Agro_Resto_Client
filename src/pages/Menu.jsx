@@ -38,9 +38,10 @@ function MenuCategory({ category, title, MenuData, jumlah, tambah, kurang }) {
   );
 }
 
-function RecomendationCategory({ title, MenuData, jumlah, tambah, kurang }) {
+function RecomendationCategory({ title, MenuData, jumlah, tambah, kurang, onEmpty }) {
   const topItems = MenuData
     .filter(item => (item.stocks ?? 0) > 0)
+    .filter(item => (item.solds ?? 0) > 0)
     .map(item => ({
       ...item,
       solds: item.solds ?? 0
@@ -54,27 +55,37 @@ function RecomendationCategory({ title, MenuData, jumlah, tambah, kurang }) {
     })
     .slice(0, 5);
 
+  useEffect(() => {
+    if (onEmpty) onEmpty(topItems.length === 0);
+  }, [topItems, onEmpty]);
+
   return (
     <>
-      <h2 className="text-left text-2xl font-bold mb-4">{title}</h2>
-      <div className="grid grid-cols-2 gap-4 max-h-screen scrollbar-hide overflow-y-scroll mb-4">
-        {topItems.map(item => (
-          <MenuCard
-            key={item.id}
-            id={item.id}
-            name={item.name}
-            cn={item.cn}
-            desc={item.desc}
-            price={item.price}
-            promotion={item.promotion}
-            stocks={item.stocks}
-            image={item.image}
-            jumlah={jumlah[item.id] || 0}
-            tambah={tambah}
-            kurang={kurang}
-          />
-        ))}
-      </div>
+      {topItems.length > 0 && (<><h2 className="text-left text-2xl font-bold mb-4">{title}</h2>
+        <div className="grid grid-cols-2 gap-4 max-h-screen scrollbar-hide overflow-y-scroll mb-4">
+          {topItems.map(item => (
+            <MenuCard
+              key={item.id}
+              id={item.id}
+              name={item.name}
+              cn={item.cn}
+              desc={item.desc}
+              price={item.price}
+              promotion={item.promotion}
+              stocks={item.stocks}
+              image={item.image}
+              jumlah={jumlah[item.id] || 0}
+              tambah={tambah}
+              kurang={kurang}
+            />
+          ))}
+        </div>
+        <section id="Main Dish">
+          <br />
+        </section>
+        <br />
+        <br />
+      </>)}
     </>
   );
 }
@@ -88,6 +99,8 @@ export const Menu = () => {
 
   const [searchParams] = useSearchParams();
   const tableId = searchParams.get("tableId");
+
+  const [isBestSellerEmpty, setIsBestSellerEmpty] = useState(false);
 
   useEffect(() => {
     const unsub = onSnapshot(
@@ -181,7 +194,7 @@ export const Menu = () => {
 
   return (
     <div className="min-h-screen overflow-x-hidden pb-16">
-      <Navbar />
+      <Navbar isBestSellerEmpty={isBestSellerEmpty} />
 
       <main className="container mt-16">
 
@@ -192,14 +205,9 @@ export const Menu = () => {
             jumlah={jumlah}
             tambah={tambah}
             kurang={kurang}
+            onEmpty={setIsBestSellerEmpty}
           />
         </section>
-
-        <section id="Main Dish">
-          <br />
-        </section>
-        <br />
-        <br />
 
         <MenuCategory
           category="Main Dish"
