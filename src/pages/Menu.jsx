@@ -28,6 +28,7 @@ function MenuCategory({ category, title, MenuData, jumlah, tambah, kurang }) {
             promotion={item.promotion}
             stocks={item.stocks}
             image={item.image}
+            desc={item.desc}
             jumlah={jumlah[item.id] || 0}
             tambah={tambah}
             kurang={kurang}
