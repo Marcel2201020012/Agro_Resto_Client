@@ -260,6 +260,29 @@ export const ConfirmationPage = () => {
                                 minimumFractionDigits: 0
                             }).format(Number(orderDetails.total * 0.1))}</span>
                     </div>
+                    {(orderDetails.status === "Preparing Food" || orderDetails.status === "Order Finished") && (<div className="flex justify-between items-center">
+                        <span className="font-bold">{orderDetails.payment}</span>
+                        {orderDetails.cash ? (<span className="font-bold">{new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0
+                        }).format(Number(orderDetails.cash))}</span>) : (<span className="font-bold">{new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0
+                        }).format(Number(orderDetails.total + 2 * orderDetails.total * 0.1))}</span>)}
+                    </div>)}
+
+                    {orderDetails.cash > orderDetails.total + 2 * orderDetails.total * 0.1 && (
+                        <div className="flex justify-between items-center">
+                            <span className="font-bold">Change</span>
+                            <span className="font-bold">{new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0
+                            }).format(Number(orderDetails.cash - (orderDetails.total + 2 * orderDetails.total * 0.1)))}</span>
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex justify-between mt-4 border-t pt-2">
