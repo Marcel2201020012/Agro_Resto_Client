@@ -75,7 +75,7 @@ const MenuCard = ({ id, name, cn, desc, price, promotion, stocks, image, jumlah,
 
       {openPopUp && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="relative bg-white rounded-2xl shadow-xl p-6 w-full max-w-md sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="relative bg-white rounded-2xl shadow-xl p-6 w-[90%] max-w-md mx-auto">
             <button
               onClick={() => setOpenPopUp(false)}
               className="absolute top-3 right-3 text-gray-600 hover:text-black"
@@ -86,7 +86,7 @@ const MenuCard = ({ id, name, cn, desc, price, promotion, stocks, image, jumlah,
             <img
               src={image}
               alt={name}
-              className="w-full h-48 object-cover rounded-lg"
+              className="w-full h-auto max-h-[200px] object-contain rounded-lg"
             />
 
             <h2 className="mt-4 text-xl font-bold">{name}</h2>
@@ -94,7 +94,10 @@ const MenuCard = ({ id, name, cn, desc, price, promotion, stocks, image, jumlah,
             <p className="text-gray-500 mb-2">
               {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)}
             </p>
-            <p className="text-gray-700 overflow-y-auto max-h-40 pr-2">{desc}</p>
+
+            <div className="text-gray-700 overflow-y-auto max-h-32 pr-2">
+              {desc}
+            </div>
           </div>
         </div>
       )}
