@@ -22,8 +22,10 @@ const MenuCard = ({ id, name, cn, desc, price, promotion, stocks, image, jumlah,
 
         {/* nama menu + price + promotion*/}
         <div className="text-left">
+          <div onClick={() => setOpenPopUp(true)}>
           <h3 className="text-black text-sm font-medium">{name}</h3>
           <h3 className="text-black text-sm font-medium">{cn}</h3>
+          </div>
 
           <div className="flex gap-2 items-center">
             <p className={`font-semibold ${promotion > 0 ? "line-through text-red-500 text-xs" : "text-agro-color text-sm"}`}>
