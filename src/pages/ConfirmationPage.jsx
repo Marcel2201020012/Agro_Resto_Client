@@ -180,7 +180,9 @@ export const ConfirmationPage = () => {
 
     return (
         <div className="container min-h-screen overflow-x-hidden pt-8 pb-16">
-            <PaymentInstruction />
+            {orderDetails.status === "Waiting For Payment On Cashier" &&
+                <PaymentInstruction />
+            }
             <h1 className="text-left text-sm text-agro-color font-semibold mb-1">CONFRIMATION</h1>
             <h2 className="text-left text-2xl font-bold mb-4">ORDER DETAIL</h2>
 
