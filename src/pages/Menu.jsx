@@ -234,21 +234,21 @@ export const Menu = () => {
     });
   };
 
-  if (allowed === null) {
-    return (
-      <div className="container min-h-screen flex justify-center items-center">
-        <p className="text-lg font-semibold">Checking device location...</p>
-      </div>
-    )
-  }
+  // if (allowed === null) {
+  //   return (
+  //     <div className="container min-h-screen flex justify-center items-center">
+  //       <p className="text-lg font-semibold">Checking device location...</p>
+  //     </div>
+  //   )
+  // }
 
-  if (!allowed) {
-    return (
-      <div className="container min-h-screen flex justify-center items-center">
-        <p className="text-lg font-semibold">You need to be near the restaurant to access this page...</p>
-      </div>
-    )
-  }
+  // if (!allowed) {
+  //   return (
+  //     <div className="container min-h-screen flex justify-center items-center">
+  //       <p className="text-lg font-semibold">You need to be near the restaurant to access this page...</p>
+  //     </div>
+  //   )
+  // }
 
   if (!isLoaded) {
     return (
