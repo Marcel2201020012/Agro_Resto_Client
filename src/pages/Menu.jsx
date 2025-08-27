@@ -149,9 +149,6 @@ export const Menu = () => {
     }
   }, []);
 
-  if (allowed === null) return <p>Checking your location...</p>;
-  if (!allowed) return <p>You need to be near the restaurant to access this page.</p>;
-
   useEffect(() => {
     const unsub = onSnapshot(
       collection(db, "menu_makanan"),
@@ -211,7 +208,6 @@ export const Menu = () => {
     }));
   };
 
-
   const kurang = (id) => {
     setMenu(prevMenu =>
       prevMenu.map(item =>
@@ -231,6 +227,10 @@ export const Menu = () => {
       return temp;
     });
   };
+
+  
+  if (allowed === null) return <p>Checking your location...</p>;
+  if (!allowed) return <p>You need to be near the restaurant to access this page.</p>;
 
   if (!isLoaded) {
     return (
