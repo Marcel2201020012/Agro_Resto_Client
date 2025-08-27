@@ -228,9 +228,21 @@ export const Menu = () => {
     });
   };
 
-  
-  if (allowed === null) return <p>Checking your location...</p>;
-  if (!allowed) return <p>You need to be near the restaurant to access this page.</p>;
+  if (allowed === null) {
+    return (
+      <div className="container min-h-screen flex justify-center items-center">
+        <p className="text-lg font-semibold">Checking device location...</p>
+      </div>
+    )
+  }
+
+  if (allowed === null) {
+    return (
+      <div className="container min-h-screen flex justify-center items-center">
+        <p className="text-lg font-semibold">You need to be near the restaurant to access this page...</p>
+      </div>
+    )
+  }
 
   if (!isLoaded) {
     return (
