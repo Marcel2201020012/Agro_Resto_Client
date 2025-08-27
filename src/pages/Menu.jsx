@@ -236,7 +236,7 @@ export const Menu = () => {
     )
   }
 
-  if (!allowed === null) {
+  if (!allowed) {
     return (
       <div className="container min-h-screen flex justify-center items-center">
         <p className="text-lg font-semibold">You need to be near the restaurant to access this page...</p>
