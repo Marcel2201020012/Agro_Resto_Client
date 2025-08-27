@@ -129,31 +129,31 @@ export const Menu = () => {
 
   const max_distance = 50; //in meters
 
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const userLat = position.coords.latitude;
-          const userLng = position.coords.longitude;
+  // useEffect(() => {
+  //   if (navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(
+  //       (position) => {
+  //         const userLat = position.coords.latitude;
+  //         const userLng = position.coords.longitude;
 
-          const distance = calculateDistanceMeters(userLat, userLng, location_lat, location_lng);
-          setAllowed(distance <= max_distance);
-        },
-        (error) => {
-          console.error('Location denied or unavailable', error);
-          setAllowed(false);
-        },
-        {
-          enableHighAccuracy: false,
-          timeout: 30000, // ms
-          maximumAge: 0
-        }
-      );
-    } else {
-      alert('Geolocation is not supported by your browser.');
-      setAllowed(false);
-    }
-  }, []);
+  //         const distance = calculateDistanceMeters(userLat, userLng, location_lat, location_lng);
+  //         setAllowed(distance <= max_distance);
+  //       },
+  //       (error) => {
+  //         console.error('Location denied or unavailable', error);
+  //         setAllowed(false);
+  //       },
+  //       {
+  //         enableHighAccuracy: false,
+  //         timeout: 30000, // ms
+  //         maximumAge: 0
+  //       }
+  //     );
+  //   } else {
+  //     alert('Geolocation is not supported by your browser.');
+  //     setAllowed(false);
+  //   }
+  // }, []);
 
   useEffect(() => {
     const unsub = onSnapshot(
