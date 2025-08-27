@@ -67,7 +67,14 @@ export const ConfirmationPage = () => {
     };
 
     useEffect(() => {
-        let isMounted = true; // track mounted state
+        // const redirectCheck = sessionStorage.getItem(`payment_${orderId}`) || transaction_status;
+        if (!orderId || orderId === "") {
+            removeSessionStorage(orderId);
+            navigate(`/menu?tableId=${tableId}`, { replace: true });
+            return;
+        }
+
+        let isMounted = true;
         const docRef = doc(db, "transaction_id", orderId);
 
         const bootstrapFromNavigationState = async (stateData) => {
@@ -113,13 +120,13 @@ export const ConfirmationPage = () => {
                         await updateDoc(docRef, { status: "Preparing Food" });
                         setStatus("Preparing Food");
                     }
-                // } else if (transaction_status === "pending" && data.status !== "Waiting For Payment On Cashier") {
-                // } else if (data.status !== "Waiting For Payment On Cashier") {
-                //     console.log("run the second condition");
-                //     if (isMounted) {
-                //         await updateDoc(docRef, { status: "Waiting For Payment On Cashier" });
-                //         setStatus("Waiting For Payment On Cashier");
-                //     }
+                    // } else if (transaction_status === "pending" && data.status !== "Waiting For Payment On Cashier") {
+                    // } else if (data.status !== "Waiting For Payment On Cashier") {
+                    //     console.log("run the second condition");
+                    //     if (isMounted) {
+                    //         await updateDoc(docRef, { status: "Waiting For Payment On Cashier" });
+                    //         setStatus("Waiting For Payment On Cashier");
+                    //     }
                 } else {
                     console.log("run the third condition");
                     if (isMounted) setStatus(data.status);
@@ -131,13 +138,6 @@ export const ConfirmationPage = () => {
                 if (isMounted) setIsSaving(false);
             }
         });
-
-        // const redirectCheck = sessionStorage.getItem(`payment_${orderId}`) || transaction_status;
-        const redirectCheck = location.state?.createdAt;
-        if (redirectCheck === "") {
-            removeSessionStorage(orderId);
-            navigate(`/menu?tableId=${tableId}`, { replace: true });
-        }
 
         // Send email via Formspree
         //         await fetch("https://formspree.io/f/movlppyb", {
@@ -163,7 +163,7 @@ export const ConfirmationPage = () => {
             isMounted = false;
             unsubscribe();
         };
-    // }, [orderId, location, paymentUrl, navigate]);
+        // }, [orderId, location, paymentUrl, navigate]);
     }, [orderId, location, navigate]);
 
     // const handlePayNow = () => {
@@ -180,7 +180,7 @@ export const ConfirmationPage = () => {
 
     return (
         <div className="container min-h-screen overflow-x-hidden pt-8 pb-16">
-            <PaymentInstruction/>
+            <PaymentInstruction />
             <h1 className="text-left text-sm text-agro-color font-semibold mb-1">CONFRIMATION</h1>
             <h2 className="text-left text-2xl font-bold mb-4">ORDER DETAIL</h2>
 
@@ -244,21 +244,21 @@ export const ConfirmationPage = () => {
                             }
                         </div>
                     ))}
-                     <div className="flex justify-between items-center">
-                            <span className="font-bold">Service 10%</span>
-                            <span className="font-bold">{new Intl.NumberFormat('id-ID', {
-                                style: 'currency',
-                                currency: 'IDR',
-                                minimumFractionDigits: 0
-                            }).format(Number(orderDetails.total * 0.1))}</span>
+                    <div className="flex justify-between items-center">
+                        <span className="font-bold">Service 10%</span>
+                        <span className="font-bold">{new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0
+                        }).format(Number(orderDetails.total * 0.1))}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                            <span className="font-bold">Tax 10%</span>
-                            <span className="font-bold">{new Intl.NumberFormat('id-ID', {
-                                style: 'currency',
-                                currency: 'IDR',
-                                minimumFractionDigits: 0
-                            }).format(Number(orderDetails.total * 0.1))}</span>
+                        <span className="font-bold">Tax 10%</span>
+                        <span className="font-bold">{new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0
+                        }).format(Number(orderDetails.total * 0.1))}</span>
                     </div>
                     {(orderDetails.status === "Preparing Food" || orderDetails.status === "Order Finished") && (<div className="flex justify-between items-center">
                         <span className="font-bold">{orderDetails.payment}</span>

@@ -91,6 +91,21 @@ function RecomendationCategory({ title, MenuData, jumlah, tambah, kurang, onEmpt
   );
 }
 
+function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
+  const R = 6371e3; // meters
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) *
+    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // in meters
+}
+
 export const Menu = () => {
   const [jumlah, setJumlah] = useState({});
 
@@ -102,6 +117,35 @@ export const Menu = () => {
   const tableId = searchParams.get("tableId");
 
   const [isBestSellerEmpty, setIsBestSellerEmpty] = useState(false);
+
+  const [allowed, setAllowed] = useState(null);
+  const location_lat = 1.0295826;
+  const location_lng = 104.6544139;
+  const max_distance = 50; //in meters
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const userLat = position.coords.latitude;
+          const userLng = position.coords.longitude;
+
+          const distance = calculateDistanceMeters(userLat, userLng, location_lat, location_lng);
+          setAllowed(distance <= max_distance);
+        },
+        (error) => {
+          console.error('Location denied or unavailable', error);
+          setAllowed(false);
+        }
+      );
+    } else {
+      alert('Geolocation is not supported by your browser.');
+      setAllowed(false);
+    }
+  }, []);
+
+  if (allowed === null) return <p>Checking your location...</p>;
+  if (!allowed) return <p>You need to be near the restaurant to access this page.</p>;
 
   useEffect(() => {
     const unsub = onSnapshot(

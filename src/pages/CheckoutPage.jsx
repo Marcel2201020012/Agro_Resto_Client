@@ -41,6 +41,11 @@ export const CheckoutPage = () => {
     const [paymentError, setPaymentError] = useState("");
 
     useEffect(() => {
+        if (!selectedMenu || selectedMenu.length <= 0 || !tableId || tableId === "null") {
+            navigate(`/menu?tableId=${tableId}`, { replace: true });
+            return;
+        }
+
         const userName = sessionStorage.getItem("fullName");
         if (userName) {
             setFullName(JSON.parse(userName));
