@@ -301,6 +301,21 @@ export const Menu = () => {
           kurang={kurang}
         />
 
+        <section id="Rice Bowl">
+          <br />
+        </section>
+        <br />
+        <br />
+
+        <MenuCategory
+          category="Rice Bowl"
+          title="Rice Bowl"
+          MenuData={MenuData}
+          jumlah={jumlah}
+          tambah={tambah}
+          kurang={kurang}
+        />
+
         <section id="Coffee">
           <br />
         </section>

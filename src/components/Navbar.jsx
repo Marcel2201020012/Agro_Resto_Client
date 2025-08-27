@@ -18,6 +18,7 @@ export const Navbar = ({ isBestSellerEmpty = false }) => {
     !isBestSellerEmpty && { name: "Main Dish", href: "#Main Dish" },
     isBestSellerEmpty && {name: "Main Dish", href: "#"},
     { name: "Sides", href: "#Sides" },
+    { name: "Rice Bowl", href: "#Rice Bowl" },
     { name: "Coffee", href: "#Coffee" },
     { name: "Non-Coffee", href: "#Non-Coffee" },
     { name: "Juice", href: "#Juice" },
