@@ -119,8 +119,8 @@ export const Menu = () => {
   const [isBestSellerEmpty, setIsBestSellerEmpty] = useState(false);
 
   const [allowed, setAllowed] = useState(null);
-  const location_lat = 1.0295826;
-  const location_lng = 104.6544139;
+  const location_lat = 1.0328001;
+  const location_lng = 104.6570971;
   const max_distance = 50; //in meters
 
   useEffect(() => {
