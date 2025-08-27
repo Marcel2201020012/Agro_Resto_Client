@@ -119,8 +119,14 @@ export const Menu = () => {
   const [isBestSellerEmpty, setIsBestSellerEmpty] = useState(false);
 
   const [allowed, setAllowed] = useState(null);
-  const location_lat = 1.0295826;
-  const location_lng = 104.6544139;
+  //mess
+  // const location_lat = 1.0295826;
+  // const location_lng = 104.6544139;
+
+  //asiana
+  const location_lat = 1.0327699;
+  const location_lng = 104.6570696;
+
   const max_distance = 50; //in meters
 
   useEffect(() => {
