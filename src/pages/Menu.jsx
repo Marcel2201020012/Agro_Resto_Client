@@ -136,6 +136,11 @@ export const Menu = () => {
         (error) => {
           console.error('Location denied or unavailable', error);
           setAllowed(false);
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 30000, // ms
+          maximumAge: 0
         }
       );
     } else {
