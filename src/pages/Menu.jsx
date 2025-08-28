@@ -124,36 +124,40 @@ export const Menu = () => {
   // const location_lng = 104.6544139;
 
   //asiana
-  const location_lat = 1.0327699;
-  const location_lng = 104.6570696;
+  // const location_lat = 1.0327699;
+  // const location_lng = 104.6570696;
 
-  const max_distance = 50; //in meters
+  //agro
+  const location_lat = 1.0312068
+  const location_lng = 104.6561567
 
-  // useEffect(() => {
-  //   if (navigator.geolocation) {
-  //     navigator.geolocation.getCurrentPosition(
-  //       (position) => {
-  //         const userLat = position.coords.latitude;
-  //         const userLng = position.coords.longitude;
+  const max_distance = 2000; //in meters
 
-  //         const distance = calculateDistanceMeters(userLat, userLng, location_lat, location_lng);
-  //         setAllowed(distance <= max_distance);
-  //       },
-  //       (error) => {
-  //         console.error('Location denied or unavailable', error);
-  //         setAllowed(false);
-  //       },
-  //       {
-  //         enableHighAccuracy: false,
-  //         timeout: 30000, // ms
-  //         maximumAge: 0
-  //       }
-  //     );
-  //   } else {
-  //     alert('Geolocation is not supported by your browser.');
-  //     setAllowed(false);
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const userLat = position.coords.latitude;
+          const userLng = position.coords.longitude;
+
+          const distance = calculateDistanceMeters(userLat, userLng, location_lat, location_lng);
+          setAllowed(distance <= max_distance);
+        },
+        (error) => {
+          console.error('Location denied or unavailable', error);
+          setAllowed(false);
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 30000, // ms
+          maximumAge: 0
+        }
+      );
+    } else {
+      alert('Geolocation is not supported by your browser.');
+      setAllowed(false);
+    }
+  }, []);
 
   useEffect(() => {
     const unsub = onSnapshot(
@@ -234,21 +238,21 @@ export const Menu = () => {
     });
   };
 
-  // if (allowed === null) {
-  //   return (
-  //     <div className="container min-h-screen flex justify-center items-center">
-  //       <p className="text-lg font-semibold">Checking device location...</p>
-  //     </div>
-  //   )
-  // }
+  if (allowed === null) {
+    return (
+      <div className="container min-h-screen flex justify-center items-center">
+        <p className="text-lg font-semibold">Checking device location...</p>
+      </div>
+    )
+  }
 
-  // if (!allowed) {
-  //   return (
-  //     <div className="container min-h-screen flex justify-center items-center">
-  //       <p className="text-lg font-semibold">You need to be near the restaurant to access this page...</p>
-  //     </div>
-  //   )
-  // }
+  if (!allowed) {
+    return (
+      <div className="container min-h-screen flex justify-center items-center">
+        <p className="text-lg font-semibold">You need to be near the restaurant to access this page...</p>
+      </div>
+    )
+  }
 
   if (!isLoaded) {
     return (
