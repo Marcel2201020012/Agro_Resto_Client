@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MapPinOff, Loader2 } from "lucide-react";
 import MenuCard from "../components/MenuCard";
 import { useEffect, useState, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -240,17 +240,52 @@ export const Menu = () => {
 
   if (allowed === null) {
     return (
-      <div className="container min-h-screen flex justify-center items-center">
-        <p className="text-lg font-semibold">Checking device location...</p>
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 px-4">
+      <div className="bg-white shadow-md rounded-lg p-6 max-w-md text-center">
+        {/* Loading Icon */}
+        <div className="flex justify-center mb-4 animate-spin">
+          <Loader2 className="h-12 w-12 text-blue-500" />
+        </div>
+
+        {/* English Text */}
+        <p className="text-lg font-semibold mb-2">
+          Checking device location...
+        </p>
+
+        {/* Chinese Text */}
+        <p className="text-lg font-semibold text-gray-700">
+          正在检查设备定位...
+        </p>
       </div>
+    </div>
     )
   }
 
   if (!allowed) {
     return (
-      <div className="container min-h-screen flex justify-center items-center">
-        <p className="text-lg font-semibold">You need to be near the restaurant to access this page...</p>
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 px-4">
+        <div className="bg-white shadow-md rounded-lg p-6 max-w-lg text-center">
+          {/* Icon */}
+          <div className="flex justify-center mb-4">
+            <MapPinOff className="h-12 w-12 text-red-500" />
+          </div>
+
+          <p className="text-lg font-semibold mb-2">
+            You need to be near the restaurant to access this page…
+          </p>
+          <p className="text-red-500 font-medium mb-4">
+            Please enable your device location
+          </p>
+
+          <p className="text-lg font-semibold mb-2">
+            您需要在餐厅附近才能访问此页面…
+          </p>
+          <p className="text-red-500 font-medium">
+            请开启您的设备定位功能
+          </p>
+        </div>
       </div>
+
     )
   }
 
