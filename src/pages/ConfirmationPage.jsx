@@ -288,8 +288,11 @@ export const ConfirmationPage = () => {
                 </div>
 
                 <div className="flex justify-between mt-4 border-t pt-2">
-                    <p className="font-bold">Total</p>
-                    <p className="text-green-700 font-bold">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(orderDetails.total + 2 * orderDetails.total * 0.1)}</p>
+                    <div className="text-left">
+                        <p className="font-bold">Total</p>
+                        <p className="text-xs italic"> *Tax Included</p>
+                    </div>
+                    <p className="text-green-700 font-bold">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(orderDetails.total)}</p>
                 </div>
             </div>
 

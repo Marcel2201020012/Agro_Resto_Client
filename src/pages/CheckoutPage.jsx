@@ -289,7 +289,7 @@ export const CheckoutPage = () => {
                 <div className="flex justify-between mt-4 border-t pt-2">
                     <div className='text-left'>
                         <p className='font-semibold'>Total Order</p>
-                        <p className='text-xs italic'>*Before Tax</p>
+                        <p className='text-xs italic'>*Tax Included</p>
                     </div>
                     <p className="text-green-700 font-semibold">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total)}</p>
                 </div>
