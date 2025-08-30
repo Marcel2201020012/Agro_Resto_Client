@@ -273,17 +273,17 @@ export const ConfirmationPage = () => {
                             style: 'currency',
                             currency: 'IDR',
                             minimumFractionDigits: 0
-                        }).format(Number(orderDetails.total + 2 * orderDetails.total * 0.1))}</span>)}
+                        }).format(Number(orderDetails.total))}</span>)}
                     </div>)}
 
-                    {orderDetails.cash > orderDetails.total + 2 * orderDetails.total * 0.1 && (
+                    {orderDetails.cash > orderDetails.total && (
                         <div className="flex justify-between items-center">
                             <span className="font-bold">Change</span>
                             <span className="font-bold">{new Intl.NumberFormat('id-ID', {
                                 style: 'currency',
                                 currency: 'IDR',
                                 minimumFractionDigits: 0
-                            }).format(Number(orderDetails.cash - (orderDetails.total + 2 * orderDetails.total * 0.1)))}</span>
+                            }).format(Number(orderDetails.cash))}</span>
                         </div>
                     )}
                 </div>
