@@ -283,7 +283,7 @@ export const ConfirmationPage = () => {
                                 style: 'currency',
                                 currency: 'IDR',
                                 minimumFractionDigits: 0
-                            }).format(Number(orderDetails.cash))}</span>
+                            }).format(Number(orderDetails.cash - (orderDetails.total)))}</span>
                         </div>
                     )}
                 </div>
