@@ -86,7 +86,7 @@ export const ConfirmationPage = () => {
 
                 // await updateDoc(docRef, { paymentUrl });
                 if (stateData.status === "Preparing Food") {
-                    await updateStock(stateData);
+                    // await updateStock(stateData);
                 }
                 // await updateMenuSolds(stateData.orderDetails);
 
@@ -229,8 +229,8 @@ export const ConfirmationPage = () => {
             </div>
 
             <div className="border p-4 rounded-xl bg-gray-50">
-                <div className="space-y-2">
-                    {orderDetails?.orderDetails?.map((item) => (
+                <div className="space-y-2">                    
+                    {Object.values(orderDetails.orderDetails).map((item) => (
                         <div key={item.id} className="flex justify-between items-center">
                             <div className="text-left">
                                 <span>{item.jumlah}x</span>{' '}
