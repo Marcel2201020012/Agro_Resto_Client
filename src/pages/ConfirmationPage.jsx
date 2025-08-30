@@ -54,7 +54,8 @@ export const ConfirmationPage = () => {
     const updateStock = async (details) => {
         if (!details?.orderDetails) return;
 
-        const batchUpdates = details.orderDetails.map(async (item) => {
+        const orderDetailsArray = Object.values(details.orderDetails || {});
+        const batchUpdates = orderDetailsArray.map(async (item) => {
             try {
                 const menuRef = doc(db, "menu_makanan", item.id);
                 await updateDoc(menuRef, { stocks: increment(-item.jumlah) });
